@@ -15,7 +15,6 @@ import { Footer } from '@/components/footer'
 import { BackToTop } from '@/components/back-to-top'
 import { CookieConsent } from '@/components/cookie-consent'
 import { ScrollProgress } from '@/components/scroll-progress'
-import { LiveChatWidget } from '@/components/live-chat-widget'
 import { SkeletonGrid } from '@/components/skeleton-card'
 import { Features } from '@/components/sections/features'
 import { Testimonials } from '@/components/sections/testimonials'
@@ -429,7 +428,6 @@ export default function Home() {
       <ScrollProgress />
       <BackToTop />
       <CookieConsent />
-      <LiveChatWidget />
 
       {/* Overlays */}
       <CartSheet
