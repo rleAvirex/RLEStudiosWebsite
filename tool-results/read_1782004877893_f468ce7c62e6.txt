@@ -1,0 +1,588 @@
+     1→# RLE Studios WebStore - Worklog
+     2→
+     3→---
+     4→Task ID: 1
+     5→Agent: Main Agent
+     6→Task: Create RLE Studios FiveM Script WebStore
+     7→
+     8→Work Log:
+     9→- Explored project structure (Next.js 16, TypeScript, Tailwind CSS, shadcn/ui, Prisma)
+    10→- Designed Prisma schema: Product, CartItem, Order, OrderItem models
+    11→- Pushed schema to SQLite database
+    12→- Updated globals.css with dark theme and orange accent colors (oklch orange)
+    13→- Updated layout.tsx with RLE Studios metadata and dark class on html element
+    14→- Created Zustand cart store with persist middleware (localStorage)
+    15→- Built Navbar component with scroll detection, mobile menu, cart badge
+    16→- Built Hero section with gradient effects, stats, CTA buttons
+    17→- Built ProductCard component with image, category badge, add-to-cart
+    18→- Built ProductDetailDialog with features list and add-to-cart
+    19→- Built CartSheet with quantity controls, total, checkout button
+    20→- Built Footer with brand, quick links, social icons
+    21→- Created main page.tsx combining all components with search & category filter
+    22→- Created /api/products GET route
+    23→- Created /api/seed POST route with 9 sample FiveM scripts
+    24→- Generated 9 AI product images using z-ai image generation CLI
+    25→- Fixed ESLint errors (removed mounted state pattern, used direct render)
+    26→- Verified with agent-browser: hero, featured section, product grid, search, category filter, product detail dialog, cart sheet, mobile layout, footer
+    27→
+    28→Stage Summary:
+    29→- Fully functional RLE Studios webstore running at localhost:3000
+    30→- Dark theme with orange accent, minimalistic design
+    31→- 9 FiveM script products seeded in database with AI-generated images
+    32→- Cart system with Zustand + localStorage persistence
+    33→- Search and category filtering working
+    34→- Responsive design for mobile and desktop
+    35→- All lint checks passing
+    36→- Cron job created for 15-minute webDevReview cycle
+    37→
+    38→Unresolved / Next Steps:
+    39→- Checkout flow (currently just a button, no payment integration)
+    40→- Product detail page could use more polish
+    41→- Could add testimonials/reviews section
+    42→- Could add Discord integration widget
+    43→- Could add product version changelog
+    44→- Could add order confirmation flow
+    45→- Could add admin panel for managing products
+    46→- Images initially returned 404 on first load (server needed restart to pick up static files)
+    47→
+    48→---
+    49→Task ID: 2
+    50→Agent: Cron Review Agent (Round 1)
+    51→Task: QA test the existing site, then add more features and improve styling per user request
+    52→
+    53→Work Log:
+    54→- Reviewed worklog.md — site was stable, all core features working from Task ID 1
+    55→- Ran ESLint check — passes clean
+    56→- QA tested with agent-browser: confirmed hero, featured, scripts, cart, search, filter, mobile layout all functional
+    57→- Updated Prisma schema: added rating (Float), salesCount (Int), originalPrice (Float?), lastUpdated (String) to Product; added NewsletterSubscriber model
+    58→- Reset database and pushed new schema
+    59→- Updated seed route with extended product data including ratings (4.5-5.0), sales counts (423-2156), discount prices, and last-updated timestamps
+    60→- Added /api/seed?force=true support to allow re-seeding after schema changes
+    61→- Updated /api/products route to return new fields
+    62→- Created /api/orders POST (creates Order + OrderItems, increments product.salesCount) and GET endpoints
+    63→- Created /api/newsletter POST endpoint with email validation and duplicate check
+    64→- Enhanced Zustand store:
+    65→  - Added totalSavings() to cart store (computes discount savings)
+    66→  - Created useWishlistStore (persist) with toggle/remove/has/clear
+    67→  - Created useRecentlyViewedStore (persist) tracking last 4 viewed products
+    68→- Enhanced Hero section: split into 7/5 grid with text + floating preview cards (Police MDT, Custom HUD, discount badge, rating bubble), trust indicators, better mobile-first responsive layout
+    69→- Built new sections (all in src/components/sections/):
+    70→  - Features.tsx — "Why Choose Us" with 4 icon cards (Instant Delivery, Secure Checkout, Lifetime Updates, 24/7 Support)
+    71→  - StatsBanner.tsx — 4-stat strip (Scripts Sold, Active Servers, Avg Rating, Support Response)
+    72→  - Testimonials.tsx — 6 customer reviews with avatars and 5-star ratings
+    73→  - CTABanner.tsx — Mid-page promotional banner with bundle discount CTA
+    74→  - RecentlyViewed.tsx — Grid of last 4 viewed products (hidden if empty)
+    75→  - FAQ.tsx — 8-question accordion with first item expanded by default
+    76→  - Newsletter.tsx — Email capture form with success state, calls /api/newsletter
+    77→- Enhanced ProductCard: star rating display, sales count chip, wishlist heart button (toggle), discount badge (-29%, -20%, etc.), strikethrough original price, hover lift effect
+    78→- Enhanced ProductDetailDialog: rating row with stars, sales count, last-updated chip, 3-up guarantee strip (Instant Delivery / Lifetime Updates / Secure Checkout), wishlist heart button in action row
+    79→- Enhanced CartSheet: trust badges (Secure payment / Instant delivery / Lifetime updates), savings indicator, total includes discount savings, integrated checkout triggers CheckoutDialog
+    80→- Built CheckoutDialog: multi-step flow (details → processing → success), order summary with savings, customer info form (name + email), POST to /api/orders, success state with order ID, "Continue Shopping" CTA
+    81→- Built WishlistSheet: list of saved products with thumbnail, name, price, "Add" to cart button and remove button
+    82→- Updated Navbar: added wishlist icon with badge count, both desktop and mobile show wishlist + cart icons
+    83→- Updated Footer: 4-column layout (Brand+Social / Explore / Support), hover animations on links, "Not affiliated with Rockstar" disclaimer
+    84→- Updated page.tsx: integrated all new sections, added Sort dropdown (5 options: Newest, Price Low-High, Price High-Low, Most Popular, Top Rated), showing result count "Showing X of Y scripts", reset-filters button when no results
+    85→- Resolved dev server stale Prisma client issue (caused by deleting DB while dev server held open file descriptor): restarted dev server process to pick up fresh PrismaClient
+    86→- Fixed ESLint errors:
+    87→  - Removed inline component declarations in navbar (WishlistButton/CartButton) — replaced with direct JSX to satisfy react-hooks/static-components rule
+    88→- Final QA verified via agent-browser:
+    89→  - Hero renders with floating cards and trust indicators
+    90→  - StatsBanner shows 12,400+ scripts sold, 2,800+ servers, 4.9/5 rating, <30min response
+    91→  - Featured section shows discount badges, ratings, sales counts, wishlist hearts
+    92→  - Features section renders 4 cards
+    93→  - All scripts grid with working sort dropdown, search, and category filter
+    94→  - CTA banner renders with 30% off promo
+    95→  - Testimonials render 6 reviews
+    96→  - Recently viewed tracks opened products
+    97→  - FAQ accordion works (8 questions, first expanded by default)
+    98→  - Newsletter form submits successfully and saves to DB (verified via DB query)
+    99→  - Cart add/update/remove works with savings indicator
+   100→  - Checkout flow: add items → checkout → fill form → success state with order ID
+   101→  - Order saved to DB with correct items and total (verified via DB query: 1 order, 2 items, €44.98 total)
+   102→  - Wishlist toggle works, opens wishlist sheet, can add to cart from wishlist
+   103→  - Mobile layout (375x812) renders correctly with all sections
+   104→
+   105→Stage Summary:
+   106→- Site now has 10+ major sections (Hero, StatsBanner, Featured, Features, All Scripts with sort/filter, CTA, Testimonials, Recently Viewed, FAQ, Newsletter, Footer)
+   107→- Backend expanded: 4 API routes (products, seed, orders, newsletter)
+   108→- Database schema expanded with rating, salesCount, originalPrice, lastUpdated, NewsletterSubscriber
+   109→- New features: wishlist (with persistence), recently viewed tracking, multi-step checkout with order persistence, newsletter signup with persistence, sort dropdown (5 options)
+   110→- Visual polish: discount badges, star ratings, sales counts, floating hero cards, trust badges, guarantee strip on product detail, better mobile responsiveness
+   111→- All ESLint checks pass, no runtime errors
+   112→- Dev server stable and serving all features
+   113→
+   114→Unresolved / Next Steps:
+   115→- Could add product reviews/comments system (users can leave reviews on purchased scripts)
+   116→- Could add admin panel for managing products (CRUD operations)
+   117→- Could add product screenshots gallery in detail dialog
+   118→- Could add bundle deals system (auto-apply 30% off when buying 3+ featured scripts — currently just a marketing banner)
+   119→- Could add user accounts / authentication (NextAuth.js is available)
+   120→- Could add download center for purchased scripts (currently checkout creates order but no download links)
+   121→- Could add search bar in navbar for quick access
+   122→- Could add product comparison feature
+   123→- Could add live chat / Discord widget integration
+   124→- Could add currency switcher (currently only EUR)
+   125→- Could add "trending now" or "new arrivals" filter tabs
+   126→- Note: dev server had stale PrismaClient issue after DB reset — required manual restart. Future cron rounds should be aware of this if schema changes again.
+   127→
+   128→---
+   129→Task ID: 3
+   130→Agent: Cron Review Agent (Round 2)
+   131→Task: QA test the site, then add more features and improve styling per user request
+   132→
+   133→Work Log:
+   134→- Reviewed worklog.md — site was stable from Task ID 2 with 10+ sections, 4 API routes, wishlist/recently-viewed/checkout/newsletter features
+   135→- Ran ESLint check — passes clean
+   136→- QA tested with agent-browser: confirmed all existing features (hero, featured, scripts, cart, checkout, wishlist, FAQ, newsletter) functional
+   137→- Selected work focus: Add promo codes, bundle deals, product comparison, my orders history, navbar search, hero animations, back-to-top
+   138→
+   139→Backend additions:
+   140→- Added PromoCode model to Prisma schema (code, description, discountType, discountValue, minOrder, maxUses, usesCount, isActive, expiresAt)
+   141→- Added subtotal, discount, promoCode fields to Order model
+   142→- Pushed schema, regenerated Prisma client, restarted dev server to pick up new client
+   143→- Created /api/promo-codes POST (seed) + GET (list active codes)
+   144→- Created /api/promo-codes/validate POST (validates code against subtotal, returns discount)
+   145→- Seeded 4 promo codes: WELCOME10 (10% off), FIVEM20 (20% off €50+), SAVE5 (€5 off), BUNDLE30 (30% off)
+   146→- Updated /api/orders POST to accept subtotal, discount, promoCode and increment promo code usage count
+   147→
+   148→Store enhancements (src/lib/store.ts):
+   149→- Replaced totalPrice() with subtotal() in cart store
+   150→- Added bundleDiscount() — auto-applies 30% off featured items when 3+ in cart
+   151→- Added hasBundleDeal() — boolean check
+   152→- Added promo: AppliedPromo | null + setPromo() + finalTotal() (subtotal - bundle - promo)
+   153→- Added useCompareStore (persist) — toggle/remove/clear, max 3 items
+   154→- Added useMyOrdersStore (persist) — addOrder/clear, stores last 50 orders
+   155→
+   156→New components:
+   157→- NavbarSearch (src/components/navbar-search.tsx) — search input in navbar with live dropdown suggestions (max 5), thumbnail + name + category + price + "Hot" badge for popular items, click opens product detail
+   158→- BackToTop (src/components/back-to-top.tsx) — floating orange button appears after 500px scroll, smooth scroll to top
+   159→- CompareSheet (src/components/compare-sheet.tsx) — side-by-side comparison up to 3 products, shows image/name/price, 8 comparison rows (Price, Category, Framework, Version, Rating, Sales, Last Updated, Featured), top 5 features list per product, add-to-cart per product
+   160→- MyOrdersSheet (src/components/my-orders-sheet.tsx) — order history from localStorage, shows date, order ID, items, subtotal/discount/total breakdown, promo code used, download button per order
+   161→
+   162→Enhanced existing components:
+   163→- Hero: added Framer Motion entrance animations (staggered children for text, floating cards animate in sequence, pulsing background glow, animated scroll indicator)
+   164→- Navbar: added search box (desktop center, mobile below), Compare icon with badge, My Orders icon, mobile menu now shows Compare + My Orders buttons
+   165→- ProductCard: added Compare button next to wishlist heart, ring highlight when in compare
+   166→- ProductDetailDialog: added Compare button in action row alongside wishlist
+   167→- CartSheet: shows bundle deal indicator (green "applied" or orange "add N more to unlock"), displays bundle discount line, promo code preview with remove button, updated totals to use finalTotal()
+   168→- CheckoutDialog: added promo code input with Apply button, validates via /api/promo-codes/validate, shows discount breakdown (subtotal, product savings, bundle, promo, total), saves order to MyOrdersStore on success, success state mentions "View in My Orders"
+   169→
+   170→Page.tsx updates:
+   171→- Wires all new components (NavbarSearch, BackToTop, CompareSheet, MyOrdersSheet)
+   172→- Passes products + onProductClick to Navbar for search
+   173→- Initializes promo-codes seed on mount
+   174→- Manages compareOpen + ordersOpen state
+   175→
+   176→Bug fixes during development:
+   177→- Fixed ESLint error in navbar-search.tsx: replaced setState-in-effect pattern with useMemo for computing suggestions
+   178→- Resolved stale Prisma client after schema change: regenerated client + restarted dev server (note: this is a recurring issue documented in Task ID 2 worklog)
+   179→
+   180→QA verification via agent-browser:
+   181→- Navbar shows: logo, search box, Scripts/Featured/FAQ links, Compare (badge), My Orders, Wishlist (badge), Cart (badge)
+   182→- Navbar search: typing "police" shows 2 suggestions (Drug Processing + Police MDT), clicking opens detail dialog
+   183→- Product detail dialog: shows Compare + Wishlist buttons in action row
+   184→- Compare: clicking compare adds to list (badge increments), opening Compare sheet shows product with 8 comparison rows + features
+   185→- Cart with 4 featured items: bundle deal auto-applied, shows "30% off 4 featured scripts (−€34.49)", total €80.47 (from €114.96 subtotal)
+   186→- Checkout with promo: applied WELCOME10, total dropped from €80.47 to €72.42 (10% off post-bundle), promo code shown in summary with remove button
+   187→- Order completion: success state shows, order saved to DB with subtotal €114.96, discount €42.54, promoCode WELCOME10, total €72.42
+   188→- My Orders: shows 1 order with full breakdown (4 items, subtotal €114.96, discount €42.54 with WELCOME10, total €72.42), download button present
+   189→- DB verification: 2 orders in DB, WELCOME10 promo usesCount incremented to 1
+   190→- Mobile (375x812): navbar shows logo + wishlist + cart + menu, search box below navbar, mobile menu shows Compare (badge) + My Orders buttons
+   191→- Back-to-top button appears after scrolling
+   192→
+   193→Stage Summary:
+   194→- Site now has 5 major new features: promo codes, bundle deals (auto-applied), product comparison (up to 3), my orders history, navbar live search
+   195→- Visual polish: Framer Motion hero animations, back-to-top button, compare ring highlight on cards, bundle deal indicators in cart
+   196→- Backend expanded: 6 API routes total (products, seed, orders, newsletter, promo-codes, promo-codes/validate)
+   197→- Database schema expanded: PromoCode model + Order.subtotal/discount/promoCode fields
+   198→- All ESLint checks pass
+   199→- All QA tests passed: search, compare, cart+bundle, checkout+promo, my orders, mobile
+   200→
+   201→Unresolved / Next Steps:
+   202→- Could add user accounts/authentication (NextAuth.js available) to sync orders across devices
+   203→- Could add product reviews/comments system
+   204→- Could add admin panel for managing products + promo codes
+   205→- Could add download center (actual file delivery, currently just a button)
+   206→- Could add product screenshots gallery in detail dialog
+   207→- Could add currency switcher (currently only EUR)
+   208→- Could add live chat / Discord widget
+   209→- Could add "trending now" or "new arrivals" filter tabs
+   210→- Could add email notifications for newsletter subscribers (currently just saved to DB)
+   211→- Note: dev server requires manual restart when Prisma schema changes (recurring issue, documented in Task ID 2)
+   212→- Could add quantity-based bundle deals (e.g., buy 2 of same script get 10% off)
+   213→- Could add wishlist sharing (generate shareable URL)
+   214→- Could add recently searched terms persistence
+   215→
+   216→---
+   217→Task ID: 4
+   218→Agent: Cron Review Agent (Round 3)
+   219→Task: QA test the site, then add more features and improve styling per user request
+   220→
+   221→Work Log:
+   222→- Reviewed worklog.md — site was stable from Task ID 3 with promo codes, bundle deals, comparison, my orders, navbar search, hero animations, back-to-top
+   223→- Ran ESLint check — passes clean
+   224→- QA tested with agent-browser: confirmed all existing features functional
+   225→- Selected work focus: Product reviews system, currency switcher, Discord widget, quick filter tabs (Trending/New Arrivals), skeleton loaders, toast action button
+   226→
+   227→Backend additions:
+   228→- Added Review model to Prisma schema (id, productId, name, rating, title, comment, helpful, createdAt)
+   229→- Pushed schema, regenerated Prisma client, restarted dev server
+   230→- Created /api/reviews GET (filter by productId) + POST (create review, auto-updates product.rating average)
+   231→- Created /api/reviews/seed POST — seeds 21 sample reviews across 9 products (2-3 reviews each)
+   232→- Fixed seed matching logic (used .find() on SAMPLE_REVIEWS array instead of Object.keys())
+   233→
+   234→Store enhancements (src/lib/store.ts):
+   235→- Added Review interface
+   236→- Added Currency type ('EUR' | 'USD' | 'GBP'), CURRENCY_RATES, CURRENCY_SYMBOLS
+   237→- Added formatPrice(eurPrice, currency) helper function
+   238→- Added useCurrencyStore (persist) with currency + setCurrency
+   239→
+   240→New components:
+   241→- CurrencySwitcher (src/components/currency-switcher.tsx) — dropdown with EUR/USD/GBP, shows symbol + label, persisted to localStorage, renders in navbar (desktop + mobile menu)
+   242→- DiscordWidget (src/components/discord-widget.tsx) — floating CTA card appears after 1000px scroll, dismissible, shows "Need help choosing?" with Join Discord link
+   243→- SkeletonCard + SkeletonGrid (src/components/skeleton-card.tsx) — animated pulse placeholder cards for product grid loading state
+   244→- ReviewsSection (src/components/reviews-section.tsx) — full reviews UI: rating summary (avg + distribution bars), review list with avatars/stars/dates, "Write Review" form with star rating picker, "Show More" pagination, fetches from /api/reviews?productId=, submits via POST
+   245→
+   246→Enhanced existing components:
+   247→- ProductCard: added reviewCount prop (shows "(N)" next to rating), added onCartOpen prop (toast action button), currency-aware prices via formatPrice()
+   248→- ProductDetailDialog: added ReviewsSection at bottom, shows review count in rating row, currency-aware prices, toast action button on add-to-cart
+   249→- Navbar: added CurrencySwitcher in desktop nav bar + mobile menu
+   250→- CartSheet: currency-aware prices for all line items, subtotal, savings, bundle, promo, total
+   251→- CheckoutDialog: currency-aware prices throughout order summary
+   252→- CompareSheet: currency-aware price comparison
+   253→- WishlistSheet: currency-aware prices
+   254→- NavbarSearch: currency-aware suggestion prices
+   255→- page.tsx: added quick filter tabs (All/Trending/New Arrivals), skeleton grid for loading, fetches reviews on init, builds reviewCounts map, passes reviewCount + onCartOpen to all ProductCard instances
+   256→
+   257→Quick filter logic:
+   258→- "All" = no filter
+   259→- "Trending" = top 4 products by salesCount × rating
+   260→- "New Arrivals" = 3 most recently created products (by createdAt)
+   261→
+   262→Bug fixes during development:
+   263→- Fixed ESLint error in currency-switcher.tsx: removed setState-in-effect pattern (mounted state), used direct render with useEffect for Escape key handler only
+   264→- Fixed toast action type: changed from {label, onClick} object to <ToastAction> React element to match ToastActionElement type
+   265→- Fixed reviews seed matching: changed from Object.keys().find() to SAMPLE_REVIEWS.find() to correctly match products by image path
+   266→
+   267→QA verification via agent-browser:
+   268→- Navbar shows: Currency switcher (EUR), Compare, My Orders, Wishlist, Cart badges
+   269→- Currency switcher: clicking opens dropdown with EUR/USD/GBP, selecting USD converts all prices (€24.99 → $26.99, 24.99×1.08=26.99 ✓)
+   270→- Product cards: show review count "(3)" next to rating, prices in selected currency
+   271→- Quick filter tabs: All (9 products), Trending (4 products), New Arrivals (3 products) — verified via JS DOM count
+   272→- Product detail dialog: shows "Customer Reviews (3)" section with 3 reviews, "Write Review" button, price in USD ($21.59)
+   273→- Review submission: filled form (name, 5 stars, title, comment), submitted, review count went 3→4, "Show More Reviews (1 remaining)" appeared
+   274→- DB verification: 22 reviews in DB (up from 21), new review "TestUser 5★ Great product!" saved
+   275→- Toast action: "View Cart" button appears on add-to-cart toast
+   276→- Discord widget: appears after scrolling 1000px, shows "Need help choosing?" with Join Discord link
+   277→- Back-to-top button: appears after scrolling
+   278→- Mobile (375x812): navbar shows logo + wishlist + cart + menu, search box below, mobile menu includes Currency switcher + Compare + My Orders
+   279→
+   280→Stage Summary:
+   281→- Site now has 6 major new features: product reviews (with DB persistence + auto-rating-recalculation), currency switcher (EUR/USD/GBP), Discord widget, quick filter tabs (Trending/New Arrivals), skeleton loaders, toast action button
+   282→- Visual polish: skeleton loading animation, Discord widget card, rating distribution bars in reviews, currency symbols throughout
+   283→- Backend expanded: 8 API routes total (products, seed, orders, newsletter, promo-codes, promo-codes/validate, reviews, reviews/seed)
+   284→- Database schema expanded: Review model added
+   285→- 21 sample reviews seeded across 9 products
+   286→- All ESLint checks pass
+   287→- All QA tests passed: currency switching, review submission, quick filters, mobile responsive
+   288→
+   289→Unresolved / Next Steps:
+   290→- Could add user accounts/authentication (NextAuth.js available) to tie reviews/orders to accounts
+   291→- Could add admin panel for managing products, promo codes, and moderating reviews
+   292→- Could add download center (actual file delivery, currently just a button)
+   293→- Could add product screenshots gallery in detail dialog
+   294→- Could add live chat / Discord widget integration (currently just a CTA)
+   295→- Could add email notifications for newsletter subscribers
+   296→- Could add quantity-based bundle deals (e.g., buy 2 of same script get 10% off)
+   297→- Could add wishlist sharing (generate shareable URL)
+   298→- Could add recently searched terms persistence
+   299→- Could add product tags/keywords for better search
+   300→- Could add "verified purchase" badge on reviews (requires order history linkage)
+   301→- Could add review helpfulness voting (currently just a display)
+   302→- Could add currency conversion fee notice
+   303→- Note: dev server requires manual restart when Prisma schema changes (recurring issue since Task ID 2)
+   304→
+   305→---
+   306→Task ID: 5
+   307→Agent: Cron Review Agent (Round 4)
+   308→Task: QA test the site, then add more features and improve styling per user request
+   309→
+   310→Work Log:
+   311→- Reviewed worklog.md — site was stable from Task ID 4 with reviews, currency switcher, Discord widget, quick filters, skeleton loaders, toast actions
+   312→- Ran ESLint check — passes clean
+   313→- QA tested with agent-browser: confirmed all existing features functional
+   314→- Selected work focus: Product tags, image gallery, bundle deals section, announcement bar, cookie consent, helpfulness voting, enhanced search
+   315→
+   316→Backend additions:
+   317→- Added tags field (String, JSON array) to Product model in Prisma schema
+   318→- Pushed schema, regenerated Prisma client, reset DB for fresh seed with tags
+   319→- Updated /api/products GET to parse and return tags array
+   320→- Created /api/reviews/helpful POST endpoint — increments helpful count on a review
+   321→- Updated seed route to include 4 tags per product (e.g., garage→['garage','vehicle','impound','parking'])
+   322→- Used Python script to programmatically add tags to all 9 sample products in seed file
+   323→
+   324→Store enhancements (src/lib/store.ts):
+   325→- Added tags: string[] to Product interface
+   326→
+   327→New components:
+   328→- AnnouncementBar (src/components/announcement-bar.tsx) — top promo banner with auto-rotating messages (3 messages, 5s interval), dismissible, orange background
+   329→- CookieConsent (src/components/cookie-consent.tsx) — GDPR cookie notice appears after 1.5s delay, Accept/Decline buttons, persisted to localStorage, bottom-left floating card
+   330→- BundleDeals (src/components/sections/bundle-deals.tsx) — dedicated bundles showcase section with 3 pre-built bundles (Starter Pack 25% off, Roleplay Bundle 30% off highlighted, Economy Pro 35% off), shows product list, regular price, discount, savings, and "You pay" total per bundle
+   331→
+   332→Enhanced existing components:
+   333→- ProductDetailDialog: added image gallery (3 thumbnails + main image with switcher, image counter "1/3"), tags display (#tag chips), gallery resets on dialog close
+   334→- ProductCard: added tags display (up to 3 tag chips with "+N" overflow), Tag icon on each chip
+   335→- ReviewsSection: helpfulness voting now functional — clicking "Helpful" button does optimistic update + POST to /api/reviews/helpful, reverts on error, ThumbsUp icon scales on hover
+   336→- page.tsx: integrated AnnouncementBar (top), BundleDeals section (between Features and All Scripts), CookieConsent (floating), search now matches tags in addition to name/description, updated search placeholder to "Search by name, description, or tags..."
+   337→- Hero: updated top padding from pt-16 to pt-24 to account for announcement bar
+   338→
+   339→QA verification via agent-browser:
+   340→- Announcement bar: visible at top with rotating messages ("Buy 3+ featured scripts and get an automatic 30% bundle discount"), dismiss button works
+   341→- Bundle Deals section: 3 bundles visible (Starter Pack, Roleplay Bundle, Economy Pro), pricing correct (Starter Pack: €77.97 regular, −€19.49 discount, €58.48 you pay = 25% off)
+   342→- Product detail dialog: image gallery shows 3 thumbnails + main image, image counter "1/3" visible, clicking thumbnails switches main image
+   343→- Tags: visible in product detail dialog (#hud, #ui, #interface, #minimal for HUD product) and on product cards (3 tag chips max)
+   344→- Helpfulness voting: clicked "Helpful" button, count incremented 0→1, verified in DB (1 review with helpful=1)
+   345→- Search by tags: searching "police" returns 2 results, searching "hud" returns 1 result — tags are now searchable
+   346→- Cookie consent: appears after 1.5s with "We use cookies" heading, Accept/Decline buttons
+   347→- Currency switcher, quick filters, reviews, all previously working features still functional
+   348→
+   349→Stage Summary:
+   350→- Site now has 7 major new features: product tags (with search), image gallery in detail dialog, bundle deals section, announcement bar (rotating messages), cookie consent (GDPR), helpfulness voting on reviews, enhanced search (name + description + tags)
+   351→- Visual polish: announcement bar with rotating messages, bundle deal cards with highlighted middle option, image gallery thumbnails, tag chips on cards and detail dialog
+   352→- Backend expanded: 9 API routes total (products, seed, orders, newsletter, promo-codes, promo-codes/validate, reviews, reviews/seed, reviews/helpful)
+   353→- Database schema: tags field added to Product
+   354→- 4 tags per product seeded (36 total tags across 9 products)
+   355→- 3 curated bundle deals with 25-35% discounts
+   356→- All ESLint checks pass
+   357→- All QA tests passed: announcement bar, bundles, gallery, tags, helpfulness voting, tag search, cookie consent
+   358→
+   359→Unresolved / Next Steps:
+   360→- Could add user accounts/authentication (NextAuth.js available) to tie reviews/orders to accounts
+   361→- Could add admin panel for managing products, promo codes, bundles, and moderating reviews
+   362→- Could add actual file delivery / download center for purchased scripts
+   363→- Could add multiple real images per product (currently simulates with same image 3×)
+   364→- Could add live chat integration (currently just Discord CTA)
+   365→- Could add email notifications for newsletter subscribers
+   366→- Could add quantity-based bundle deals (e.g., buy 2 of same script get 10% off)
+   367→- Could add wishlist sharing (generate shareable URL)
+   368→- Could add recently searched terms persistence in NavbarSearch
+   369→- Could add "verified purchase" badge on reviews (requires order history linkage)
+   370→- Could add product comparison matrix view (table format)
+   371→- Could add currency conversion fee notice
+   372→- Could add dark/light theme toggle (currently dark-only)
+   373→- Could add product rating notification when review is submitted
+   374→- Note: dev server requires manual restart when Prisma schema changes (recurring issue since Task ID 2)
+   375→
+   376→---
+   377→Task ID: 6
+   378→Agent: Cron Review Agent (Round 5)
+   379→Task: QA test the site, then add more features and improve styling per user request
+   380→
+   381→Work Log:
+   382→- Reviewed worklog.md — site was stable from Task ID 5 with product tags, image gallery, bundle deals, announcement bar, cookie consent, helpfulness voting
+   383→- Ran ESLint check — passes clean
+   384→- QA tested with agent-browser: confirmed all existing features functional
+   385→- Selected work focus: Dark/light theme toggle, recently searched terms, wishlist sharing, social proof notifications, animated counters, image shimmer
+   386→
+   387→Backend/Config additions:
+   388→- Updated globals.css: split into proper :root (light theme) and .dark (dark theme) variables with full color palettes for both
+   389→- Added shimmer, slide-in-left, slide-out-left, count-up CSS animations to globals.css
+   390→- Updated layout.tsx: wrapped app in next-themes ThemeProvider (attribute="class", defaultTheme="dark", enableSystem=false, disableTransitionOnChange)
+   391→- Removed hardcoded `className="dark"` from html element (next-themes manages it now)
+   392→
+   393→New components:
+   394→- ThemeToggle (src/components/theme-toggle.tsx) — sun/moon icon toggle with CSS-controlled visibility (dark class), uses resolvedTheme from next-themes, smooth rotation animation, no hydration mismatch
+   395→- AnimatedCounter (src/components/animated-counter.tsx) — count-up animation using IntersectionObserver (starts when scrolled into view), ease-out cubic, supports prefix/suffix/renderValue, reusable
+   396→- SocialProofNotifications (src/components/social-proof-notifications.tsx) — "Someone just bought X" popups in bottom-left, 10 fake purchase events with product names/images/locations/times, appears after 8s, auto-hides after 6s, cycles every 15s, dismissible, slide-in/out animations
+   397→- ImageWithShimmer (src/components/image-with-shimmer.tsx) — image loading placeholder with shimmer animation, lazy loading, fade-in on load
+   398→
+   399→Enhanced existing components:
+   400→- Navbar: added ThemeToggle (desktop nav + mobile menu), added "Theme" row in mobile menu
+   401→- NavbarSearch: added recently searched terms (persisted to localStorage 'rle-recent-searches', max 5), shows "RECENT SEARCHES" section when search is empty, click to re-search, individual remove (X) + clear all button, Enter key submits and saves search, lazy initializer for localStorage (avoids setState-in-effect)
+   402→- WishlistSheet: added "Share Wishlist" button — generates URL with product IDs (?wishlist=id1,id2), copies to clipboard, shows "Link Copied!" confirmation for 2s, toast notification
+   403→- Hero: replaced static "50+" and "2K+" with AnimatedCounter components (50→50+, 2000→2,000+), counters animate when scrolled into view
+   404→- StatsBanner: replaced static values with AnimatedCounter (12,400+, 2,800+, 4.9/5 with custom renderValue)
+   405→- page.tsx: wired SocialProofNotifications into floating elements section
+   406→
+   407→Bug fixes during development:
+   408→- Fixed ESLint error in theme-toggle.tsx: removed mounted state pattern, used CSS-only approach for icon visibility (dark: classes control opacity/rotation), used suppressHydrationWarning on button
+   409→- Fixed ESLint error in navbar-search.tsx: replaced setState-in-effect with lazy useState initializer for localStorage loading
+   410→- Fixed theme toggle using `theme` (undefined on first render) → switched to `resolvedTheme` (reflects actual applied theme)
+   411→
+   412→QA verification via agent-browser:
+   413→- Theme toggle: visible in navbar, clicking switches html class from "dark" to "light" and vice versa, sun/moon icons swap with rotation animation
+   414→- Light theme: verified rendering — white background, dark text, orange primary, all components visible
+   415→- Dark theme: verified rendering — dark background, light text, orange primary
+   416→- Recent searches: searched "garage" → clicked result → localStorage saved ["Advanced Garage System"] → clicking search box shows "RECENT SEARCHES" with saved term
+   417→- Wishlist sharing: added item to wishlist → opened wishlist → "Share Wishlist" button visible → clicked (clipboard API works in real browser)
+   418→- Social proof notifications: waited 8s → "Someone just bought Police MDT System, Berlin, Germany · 2 minutes ago" appeared in bottom-left
+   419→- Animated counters: hero stats show "50+" and "2,000+" (animated from 0), stats banner shows "12,400+" and "2,800+" (animated when scrolled into view)
+   420→- All previously working features (currency, reviews, compare, cart, checkout, bundles, tags, etc.) still functional in both themes
+   421→
+   422→Stage Summary:
+   423→- Site now has 6 major new features: dark/light theme toggle, recently searched terms persistence, wishlist sharing via URL, social proof notifications, animated counters, image shimmer loading component
+   424→- Visual polish: smooth theme transition with icon rotation, count-up animations on hero/stats, social proof popup with slide-in animation, shimmer image loading
+   425→- Theme support: full light and dark color palettes with orange accent in both
+   426→- All ESLint checks pass
+   427→- All QA tests passed: theme toggle (dark↔light), recent searches (save/load/clear), wishlist share, social proof notifications, animated counters
+   428→
+   429→Unresolved / Next Steps:
+   430→- Could add user accounts/authentication (NextAuth.js available) to tie reviews/orders to accounts
+   431→- Could add admin panel for managing products, promo codes, bundles, and moderating reviews
+   432→- Could add actual file delivery / download center for purchased scripts
+   433→- Could add multiple real images per product (currently simulates with same image 3×)
+   434→- Could add live chat integration (currently just Discord CTA)
+   435→- Could add email notifications for newsletter subscribers
+   436→- Could add "verified purchase" badge on reviews (requires order email matching)
+   437→- Could add product comparison matrix view (table format)
+   438→- Could add currency conversion fee notice
+   439→- Could integrate ImageWithShimmer into ProductCard and ProductDetailDialog (component built but not yet used everywhere)
+   440→- Could add recently viewed section to use ImageWithShimmer
+   441→- Could add theme-aware social proof notification positioning (avoid overlap with cookie consent)
+   442→- Could add wishlist URL parsing on page load (read ?wishlist= query param and populate wishlist)
+   443→- Note: dev server requires manual restart when Prisma schema changes (recurring issue since Task ID 2)
+   444→
+   445→---
+   446→Task ID: 7
+   447→Agent: Cron Review Agent (Round 6)
+   448→Task: QA test the site, then add more features and improve styling per user request
+   449→
+   450→Work Log:
+   451→- Reviewed worklog.md — site was stable from Task ID 6 with dark/light theme toggle, recently searched terms, wishlist sharing, social proof notifications, animated counters, image shimmer
+   452→- Ran ESLint check — passes clean
+   453→- QA tested with agent-browser: confirmed all existing features functional
+   454→- Selected work focus: Scroll progress bar, live chat widget, ImageWithShimmer integration, wishlist URL parsing, custom 404 page, enhanced footer
+   455→
+   456→New components:
+   457→- ScrollProgress (src/components/scroll-progress.tsx) — fixed top progress bar showing scroll position, z-60, smooth width transition, passive scroll listener
+   458→- LiveChatWidget (src/components/live-chat-widget.tsx) — full live chat simulation: floating orange button (bottom-right) with pulse animation + unread badge, expandable 340×480px chat panel with header (online status), message area (user/agent bubbles with timestamps), typing indicator (animated dots), input with Send button, 8 auto-response messages that cycle, Enter to send, auto-scroll to bottom, dismissible
+   459→- NotFound (src/app/not-found.tsx) — custom 404 page with large "404" text + "LOL" bouncing badge, search icon, "Page Not Found" message, Back to Home + Browse Scripts buttons, background glow effect
+   460→
+   461→Enhanced existing components:
+   462→- ProductCard: integrated ImageWithShimmer for product images (shimmer placeholder during load, fade-in on load, lazy loading)
+   463→- Footer: added Bundle Deals link, payment method badges (VISA, MC, PP, STRIPE), trust badges (Secure Checkout, SSL Encrypted, Multiple Payment Methods), payment/trust section with border separator
+   464→- page.tsx: wired ScrollProgress + LiveChatWidget into floating elements, added wishlist URL parsing on page load (reads ?wishlist=id1,id2 param, populates wishlist store, cleans URL after processing)
+   465→- BackToTop: moved from bottom-6 to bottom-24 right-6 (above live chat button to avoid overlap)
+   466→- SocialProofNotifications: moved from bottom-6 to bottom-24 left-6 (above Discord widget to avoid overlap)
+   467→
+   468→Floating element layout (no overlaps):
+   469→- Bottom-left: CookieConsent (z-50, temporary), DiscordWidget (z-40, after scroll), SocialProofNotifications (z-40, bottom-24, after 8s)
+   470→- Bottom-right: LiveChatWidget (z-50, always visible), BackToTop (z-40, bottom-24, after scroll)
+   471→- Top: ScrollProgress (z-60, always visible)
+   472→
+   473→Wishlist URL parsing flow:
+   474→1. User visits URL like ?wishlist=productId1,productId2
+   475→2. On page load, after products are fetched, the URL param is parsed
+   476→3. Each product ID is looked up in the products array
+   477→4. If found, the product is added to the wishlist store
+   478→5. The URL is cleaned (query param removed) via window.history.replaceState
+   479→
+   480→QA verification via agent-browser:
+   481→- Scroll progress bar: visible at top, width changes from 0% → 6.29% → 28.6% as user scrolls
+   482→- Live chat widget: floating button visible, clicking opens chat panel with "RLE Studios Support" header + online status, typing "Hello, I need help choosing a script" → user message appears → agent responds "Thanks for reaching out! How can I help you with our FiveM scripts today?" after typing indicator
+   483→- ImageWithShimmer: product card images use shimmer loading (verified via DOM structure — parent div has "relative overflow-hidden" class from ImageWithShimmer)
+   484→- Wishlist URL parsing: visited ?wishlist=productId → wishlist badge went from empty to "1" → URL cleaned to just "/" after processing
+   485→- 404 page: visiting /nonexistent-page shows custom 404 with "404" heading, "Page Not Found" message, Back to Home + Browse Scripts buttons
+   486→- Enhanced footer: Bundle Deals link added, payment method badges visible (VISA, MC, PP, STRIPE), trust badges visible (Secure Checkout, SSL Encrypted, Multiple Payment Methods)
+   487→- All previously working features still functional
+   488→
+   489→Stage Summary:
+   490→- Site now has 6 major new features: scroll progress bar, live chat widget (with auto-responses), ImageWithShimmer integration in product cards, wishlist URL parsing (?wishlist= param), custom 404 page, enhanced footer with payment/trust badges
+   491→- Visual polish: scroll progress indicator, chat widget with typing dots + pulse animation, shimmer image loading, branded 404 page, footer payment badges
+   492→- Floating element layout optimized to avoid overlaps (chat bottom-right, social proof bottom-left raised, back-to-top above chat)
+   493→- All ESLint checks pass
+   494→- All QA tests passed: scroll progress, live chat (send + auto-response), image shimmer, wishlist URL parsing, 404 page, enhanced footer
+   495→
+   496→Unresolved / Next Steps:
+   497→- Could add user accounts/authentication (NextAuth.js available) to tie reviews/orders to accounts
+   498→- Could add admin panel for managing products, promo codes, bundles, and moderating reviews
+   499→- Could add actual file delivery / download center for purchased scripts
+   500→- Could add multiple real images per product (currently simulates with same image 3×)
+   501→- Could add live chat integration with real agent/AI (currently auto-response simulation)
+   502→- Could add email notifications for newsletter subscribers
+   503→- Could add "verified purchase" badge on reviews (requires order email matching)
+   504→- Could add product comparison matrix view (table format)
+   505→- Could add currency conversion fee notice
+   506→- Could add recently viewed section to use ImageWithShimmer
+   507→- Could add theme-aware social proof notification positioning
+   508→- Could add Quick View modal (mini product preview without full detail dialog)
+   509→- Could add product video preview in detail dialog
+   510→- Could add search results page with filters
+   511→- Could add admin dashboard for viewing orders/stats
+   512→- Note: dev server requires manual restart when Prisma schema changes (recurring issue since Task ID 2)
+   513→
+   514→---
+   515→Task ID: 8
+   516→Agent: Cron Review Agent (Round 7)
+   517→Task: QA test the site, then add more features and improve styling per user request
+   518→
+   519→Work Log:
+   520→- Reviewed worklog.md — site was stable from Task ID 7 with scroll progress, live chat, ImageWithShimmer, wishlist URL parsing, custom 404, enhanced footer
+   521→- Ran ESLint check — passes clean
+   522→- QA tested with agent-browser: confirmed all existing features functional
+   523→- Selected work focus: Quick View modal, related products, preview video, admin dashboard, currency fee notice
+   524→
+   525→New components:
+   526→- QuickViewDialog (src/components/quick-view-dialog.tsx) — mini product preview in a 2-column grid (image + info), shows category badge, title, rating, sales, price, short description (3 lines), top 3 features, Add to Cart + View Details + Compare + Wishlist buttons, "Quick View" badge on image, uses ImageWithShimmer
+   527→- AdminPage (src/app/admin/page.tsx) — server-side rendered admin dashboard with 8 stat cards (Total Revenue, Total Orders, Items Sold, Avg Order Value, Products, Reviews, Newsletter Subs, Avg Rating), each with trend indicator (+/-), Top Selling Products list (ranked 1-5), Recent Orders list (last 10), Promo Code Usage grid (all promo codes with use counts), uses direct Prisma queries
+   528→
+   529→Enhanced existing components:
+   530→- ProductCard: added onQuickView optional prop, added "Quick View" overlay button (center of image, appears on hover, Eye icon), passes onQuickView to all card instances
+   531→- ProductDetailDialog: added allProducts prop, added "Related Scripts" section (shows up to 3 related products filtered by same category/framework/shared tags, each with thumbnail/name/rating/price, clicking dispatches CustomEvent 'openProduct' to re-open dialog with related product), added Play preview video button overlay on main image (orange circle with Play icon, shows toast on click), imported Sparkles + Play icons
+   532→- CartSheet: added currency conversion fee notice ("* Prices include currency conversion. Final charge in EUR at checkout.") shown only when currency is not EUR
+   533→- page.tsx: added quickViewProduct + quickViewOpen state, openQuickView handler, useEffect listener for 'openProduct' custom events (from Related Products clicks), passes onQuickView to featured + scripts ProductCards, passes allProducts to ProductDetailDialog, wired QuickViewDialog
+   534→
+   535→Related Products logic:
+   536→- Filters allProducts by: same category OR same framework OR shared tags
+   537→- Excludes current product
+   538→- Shows up to 3 related products
+   539→- Clicking a related product closes current dialog and opens new one via CustomEvent
+   540→
+   541→Quick View flow:
+   542→1. User hovers over product card → "Quick View" button appears in center of image
+   543→2. User clicks Quick View → QuickViewDialog opens (2-column mini preview)
+   544→3. User can: Add to Cart (closes dialog + adds), View Details (closes QuickView + opens full ProductDetailDialog), Compare, or Wishlist
+   545→4. Quick and lightweight — no full page load needed
+   546→
+   547→Admin Dashboard features:
+   548→- 8 stat cards with trend indicators (green up arrow, red down arrow, neutral)
+   549→- Top Selling Products (ranked list with count + revenue)
+   550→- Recent Orders (last 10 with customer name, email, items, total, date)
+   551→- Promo Code Usage (grid of all promo codes with use counts)
+   552→- Server-side rendered with direct Prisma queries (no client-side fetching)
+   553→- "Live Data" badge in header
+   554→
+   555→QA verification via agent-browser:
+   556→- Quick View button: appears on product card hover (verified in snapshot — "Quick view" button ref present)
+   557→- Quick View dialog: clicking opens mini preview with product name, price, Add to Cart, View Details, Compare, Wishlist buttons, "Quick View" badge on image
+   558→- View Details from QuickView: clicking opens full ProductDetailDialog
+   559→- Related Products: visible in ProductDetailDialog ("Related Scripts" heading with 3 related products — Custom HUD UI, Advanced Banking, Police MDT System for Advanced Garage System)
+   560→- Related product navigation: clicking Custom HUD UI in related list → dialog reopens with Custom HUD UI and its own related products (Advanced Garage System, etc.)
+   561→- Preview video button: "Play preview video" button visible on main image in detail dialog
+   562→- Admin dashboard: visiting /admin shows 8 stat cards (Products: 9, Reviews: 21, Avg Rating: 4.8/5), Top Selling Products, Recent Orders, Promo Code Usage sections
+   563→- Currency fee notice: switching to USD + adding item to cart + opening cart → "* Prices include currency conversion. Final charge in EUR at checkout." visible
+   564→- All previously working features still functional
+   565→
+   566→Stage Summary:
+   567→- Site now has 6 major new features: Quick View modal, Related Products in detail dialog, Preview video button, Admin Dashboard (/admin), Currency conversion fee notice, ImageWithShimmer in QuickView
+   568→- Visual polish: Quick View hover button, related products cards with thumbnails, preview video play button overlay, admin dashboard with trend indicators, currency fee notice
+   569→- Backend: admin page uses server-side Prisma queries for real-time data
+   570→- All ESLint checks pass
+   571→- All QA tests passed: Quick View (open + view details), Related Products (display + navigation), Preview video button, Admin dashboard (8 stats + sections), Currency fee notice
+   572→
+   573→Unresolved / Next Steps:
+   574→- Could add user accounts/authentication (NextAuth.js available) to protect admin page
+   575→- Could add admin CRUD for products, promo codes, bundles
+   576→- Could add actual file delivery / download center for purchased scripts
+   577→- Could add multiple real images per product (currently simulates with same image 3×)
+   578→- Could add live chat integration with real agent/AI (currently auto-response simulation)
+   579→- Could add email notifications for newsletter subscribers
+   580→- Could add "verified purchase" badge on reviews (requires order email matching)
+   581→- Could add product comparison matrix view (table format)
+   582→- Could add search results page with filters
+   583→- Could add admin charts/graphs for revenue over time
+   584→- Could add export functionality for orders (CSV/Excel)
+   585→- Could add product video preview (actual video instead of placeholder)
+   586→- Could integrate ImageWithShimmer into CompareSheet, WishlistSheet, RecentlyViewed
+   587→- Note: dev server requires manual restart when Prisma schema changes (recurring issue since Task ID 2)
+   588→
