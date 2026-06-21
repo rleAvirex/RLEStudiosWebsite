@@ -382,7 +382,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
 
               <Button
                 type="submit"
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-11 font-semibold"
+                className="w-full btn-gradient-slide rounded-xl h-11 font-semibold"
               >
                 Complete Purchase — {formatPrice(finalTotal(), currency)}
               </Button>
@@ -436,7 +436,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
               </div>
 
               <Button
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-11"
+                className="w-full btn-gradient-slide rounded-xl h-11"
                 onClick={() => handleClose(false)}
               >
                 Continue Shopping

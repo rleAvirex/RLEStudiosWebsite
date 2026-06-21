@@ -54,32 +54,32 @@
   --card-foreground: oklch(0.18 0.005 260);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.005 260);
-  --primary: oklch(0.65 0.2 50);
+  --primary: oklch(0.55 0.24 292);
   --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.95 0.005 260);
   --secondary-foreground: oklch(0.25 0.005 260);
   --muted: oklch(0.95 0.005 260);
   --muted-foreground: oklch(0.45 0.01 260);
-  --accent: oklch(0.95 0.01 50);
+  --accent: oklch(0.95 0.01 292);
   --accent-foreground: oklch(0.25 0.005 260);
   --destructive: oklch(0.55 0.24 27);
   --border: oklch(0.9 0.005 260);
   --input: oklch(0.92 0.005 260);
-  --ring: oklch(0.65 0.2 50);
-  --chart-1: oklch(0.65 0.2 50);
+  --ring: oklch(0.55 0.24 292);
+  --chart-1: oklch(0.55 0.24 292);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: oklch(0.97 0.005 260);
   --sidebar-foreground: oklch(0.18 0.005 260);
-  --sidebar-primary: oklch(0.65 0.2 50);
+  --sidebar-primary: oklch(0.55 0.24 292);
   --sidebar-primary-foreground: oklch(0.99 0 0);
   --sidebar-accent: oklch(0.95 0.005 260);
   --sidebar-accent-foreground: oklch(0.25 0.005 260);
   --sidebar-border: oklch(0.9 0.005 260);
-  --sidebar-ring: oklch(0.65 0.2 50);
-  --orange: oklch(0.65 0.2 50);
+  --sidebar-ring: oklch(0.55 0.24 292);
+  --orange: oklch(0.55 0.24 292);
   --orange-foreground: oklch(0.99 0 0);
 }
 
@@ -91,33 +91,33 @@
   --card-foreground: oklch(0.97 0 0);
   --popover: oklch(0.17 0.005 260);
   --popover-foreground: oklch(0.97 0 0);
-  --primary: oklch(0.7 0.18 55);
-  --primary-foreground: oklch(0.13 0.005 260);
+  --primary: oklch(0.65 0.24 292);
+  --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.2 0.005 260);
   --secondary-foreground: oklch(0.9 0 0);
   --muted: oklch(0.2 0.005 260);
   --muted-foreground: oklch(0.6 0.01 260);
-  --accent: oklch(0.7 0.18 55);
-  --accent-foreground: oklch(0.13 0.005 260);
+  --accent: oklch(0.65 0.24 292);
+  --accent-foreground: oklch(0.99 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.28 0.01 260);
   --input: oklch(0.25 0.01 260);
-  --ring: oklch(0.7 0.18 55);
-  --chart-1: oklch(0.7 0.18 55);
+  --ring: oklch(0.65 0.24 292);
+  --chart-1: oklch(0.65 0.24 292);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: oklch(0.15 0.005 260);
   --sidebar-foreground: oklch(0.97 0 0);
-  --sidebar-primary: oklch(0.7 0.18 55);
-  --sidebar-primary-foreground: oklch(0.13 0.005 260);
+  --sidebar-primary: oklch(0.65 0.24 292);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
   --sidebar-accent: oklch(0.2 0.005 260);
   --sidebar-accent-foreground: oklch(0.97 0 0);
   --sidebar-border: oklch(0.28 0.01 260);
-  --sidebar-ring: oklch(0.7 0.18 55);
-  --orange: oklch(0.7 0.18 55);
-  --orange-foreground: oklch(0.13 0.005 260);
+  --sidebar-ring: oklch(0.65 0.24 292);
+  --orange: oklch(0.65 0.24 292);
+  --orange-foreground: oklch(0.99 0 0);
 }
 
 @layer base {
@@ -211,4 +211,63 @@ html {
 
 .animate-slide-out-left {
   animation: slide-out-left 0.4s ease-in forwards;
+}
+
+/* ===== Gradient Slide Button Style ===== */
+.btn-gradient-slide {
+  position: relative;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(120deg, #8b5cf6, #ec4899, #8b5cf6) !important;
+  background-size: 200% 100% !important;
+  background-position: 0% 50%;
+  box-shadow: 0 10px 25px -10px rgba(139, 92, 246, 0.6);
+  transition: background-position 0.6s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.btn-gradient-slide:hover {
+  background-position: 100% 50% !important;
+  transform: translateY(-2px);
+  box-shadow: 0 18px 35px -12px rgba(236, 72, 153, 0.7);
+}
+
+.btn-gradient-slide:active {
+  transform: translateY(0);
+}
+
+/* Small variant for icon buttons & compact buttons */
+.btn-gradient-slide-sm {
+  box-shadow: 0 6px 15px -6px rgba(139, 92, 246, 0.5);
+}
+.btn-gradient-slide-sm:hover {
+  box-shadow: 0 10px 22px -8px rgba(236, 72, 153, 0.6);
+}
+
+/* Gradient accent for non-button elements (badges, labels, highlights) */
+.accent-gradient {
+  background: linear-gradient(120deg, #8b5cf6, #ec4899, #8b5cf6);
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+.accent-gradient-text {
+  background: linear-gradient(120deg, #8b5cf6, #ec4899, #8b5cf6);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 4s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Gradient glow for floating elements */
+.glow-gradient {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3), 0 0 40px rgba(236, 72, 153, 0.15);
 }

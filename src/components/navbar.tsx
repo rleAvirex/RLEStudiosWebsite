@@ -50,19 +50,19 @@ export function Navbar({
   }
 
   const cartBadge = totalItems > 0 && (
-    <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-bold">
+    <span className="absolute -top-1 -right-1 h-5 w-5 accent-gradient text-white text-xs rounded-full flex items-center justify-center font-bold">
       {totalItems}
     </span>
   )
 
   const wishlistBadge = wishlistCount > 0 && (
-    <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-bold">
+    <span className="absolute -top-1 -right-1 h-5 w-5 accent-gradient text-white text-xs rounded-full flex items-center justify-center font-bold">
       {wishlistCount}
     </span>
   )
 
   const compareBadge = compareCount > 0 && (
-    <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-bold">
+    <span className="absolute -top-1 -right-1 h-5 w-5 accent-gradient text-white text-xs rounded-full flex items-center justify-center font-bold">
       {compareCount}
     </span>
   )
@@ -79,11 +79,11 @@ export function Navbar({
         <div className="flex items-center justify-between h-16 gap-2">
           {/* Logo */}
           <button onClick={() => scrollTo('hero')} className="flex items-center gap-2 group shrink-0">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-bold text-primary-foreground text-sm group-hover:scale-110 transition-transform">
+            <div className="w-8 h-8 accent-gradient rounded-lg flex items-center justify-center font-bold text-white text-sm group-hover:scale-110 transition-transform">
               R
             </div>
             <span className="text-lg font-bold tracking-tight hidden sm:inline">
-              RLE <span className="text-primary">Studios</span>
+              RLE <span className="accent-gradient-text">Studios</span>
             </span>
           </button>
 
@@ -244,7 +244,7 @@ export function Navbar({
                 <Package className="h-4 w-4 mr-1.5" />
                 Compare
                 {compareCount > 0 && (
-                  <span className="ml-1.5 bg-primary text-primary-foreground text-xs rounded-full px-1.5 py-0.5">
+                  <span className="ml-1.5 accent-gradient text-white text-xs rounded-full px-1.5 py-0.5">
                     {compareCount}
                   </span>
                 )}

@@ -27,8 +27,8 @@ export function DiscordWidget() {
         </button>
 
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-            <MessageCircle className="h-5 w-5 text-primary" />
+          <div className="w-10 h-10 rounded-xl accent-gradient flex items-center justify-center shrink-0">
+            <MessageCircle className="h-5 w-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold">Need help choosing?</p>

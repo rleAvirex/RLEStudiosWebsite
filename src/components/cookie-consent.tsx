@@ -56,7 +56,7 @@ export function CookieConsent() {
         <div className="flex gap-2">
           <Button
             size="sm"
-            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-8 text-xs"
+            className="flex-1 btn-gradient-slide btn-gradient-slide-sm rounded-lg h-8 text-xs"
             onClick={handleAccept}
           >
             Accept

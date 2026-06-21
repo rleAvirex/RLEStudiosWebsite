@@ -241,7 +241,7 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
 
               <Button
                 size="lg"
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
+                className="w-full btn-gradient-slide rounded-xl"
                 onClick={handleCheckout}
               >
                 Checkout — {formatPrice(finalTotal(), currency)}

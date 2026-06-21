@@ -91,7 +91,7 @@ export function BundleDeals({ products, onBrowse }: BundleDealsProps) {
                 }`}
               >
                 {isHighlighted && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-primary text-primary-foreground text-[10px] font-semibold rounded-full uppercase tracking-wider">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 accent-gradient text-white text-[10px] font-semibold rounded-full uppercase tracking-wider">
                     {bundle.badge}
                   </div>
                 )}
@@ -140,7 +140,7 @@ export function BundleDeals({ products, onBrowse }: BundleDealsProps) {
                 </div>
 
                 <Button
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
+                  className="w-full btn-gradient-slide rounded-xl"
                   onClick={onBrowse}
                 >
                   Get Bundle

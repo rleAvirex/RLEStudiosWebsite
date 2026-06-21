@@ -10,11 +10,11 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-bold text-primary-foreground text-sm">
+              <div className="w-8 h-8 accent-gradient rounded-lg flex items-center justify-center font-bold text-white text-sm">
                 R
               </div>
               <span className="text-lg font-bold tracking-tight">
-                RLE <span className="text-primary">Studios</span>
+                RLE <span className="accent-gradient-text">Studios</span>
               </span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">

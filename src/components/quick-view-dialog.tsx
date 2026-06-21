@@ -112,7 +112,7 @@ export function QuickViewDialog({
             />
             <div className="absolute inset-0 bg-gradient-to-t from-card/60 to-transparent pointer-events-none" />
             {product.isFeatured && (
-              <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground">
+              <Badge className="absolute top-3 left-3 accent-gradient text-white border-0">
                 <Star className="h-3 w-3 mr-1" />
                 Featured
               </Badge>
@@ -219,7 +219,7 @@ export function QuickViewDialog({
             {/* Actions */}
             <div className="mt-auto space-y-2 pt-2">
               <Button
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-10"
+                className="w-full btn-gradient-slide rounded-xl h-10"
                 onClick={handleAddToCart}
               >
                 <ShoppingCart className="h-4 w-4 mr-2" />

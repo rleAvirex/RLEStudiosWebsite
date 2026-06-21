@@ -158,7 +158,7 @@ export function ProductDetailDialog({
             />
             <div className="absolute inset-0 bg-gradient-to-t from-card/50 to-transparent" />
             {product.isFeatured && (
-              <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
+              <Badge className="absolute top-4 left-4 accent-gradient text-white border-0">
                 <Star className="h-3 w-3 mr-1" />
                 Featured
               </Badge>
@@ -181,7 +181,7 @@ export function ProductDetailDialog({
                   description: 'Video preview would play here in production.',
                 })
               }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-primary/90 hover:bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/30 hover:scale-110 transition-all"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full accent-gradient text-white flex items-center justify-center shadow-lg glow-gradient hover:scale-110 transition-all"
               aria-label="Play preview video"
               title="Play preview video"
             >
@@ -316,7 +316,7 @@ export function ProductDetailDialog({
           <div className="flex gap-3">
             <Button
               size="lg"
-              className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
+              className="flex-1 btn-gradient-slide rounded-xl"
               onClick={handleAddToCart}
             >
               <ShoppingCart className="h-5 w-5 mr-2" />

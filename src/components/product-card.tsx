@@ -141,7 +141,7 @@ export function ProductCard({ product, onViewDetail, onQuickView, featured, revi
         {/* Top-left: Featured badge OR discount badge */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {product.isFeatured && (
-            <Badge className="bg-primary text-primary-foreground text-xs w-fit">
+            <Badge className="accent-gradient text-white text-xs w-fit border-0">
               <Star className="h-3 w-3 mr-1" />
               Featured
             </Badge>
@@ -269,7 +269,7 @@ export function ProductCard({ product, onViewDetail, onQuickView, featured, revi
         {/* Add to Cart */}
         <Button
           size="sm"
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground mt-2 rounded-lg"
+          className="w-full btn-gradient-slide btn-gradient-slide-sm mt-2 rounded-lg"
           onClick={handleAddToCart}
         >
           <ShoppingCart className="h-4 w-4 mr-2" />

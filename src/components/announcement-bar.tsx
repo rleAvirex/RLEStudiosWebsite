@@ -26,7 +26,7 @@ export function AnnouncementBar() {
   const CurrentIcon = messages[msgIndex].icon
 
   return (
-    <div className="bg-primary text-primary-foreground text-xs sm:text-sm py-2 px-4">
+    <div className="accent-gradient text-white text-xs sm:text-sm py-2 px-4">
       <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-center relative">
         <CurrentIcon className="h-3.5 w-3.5 shrink-0 animate-pulse" />
         <span key={msgIndex} className="animate-in fade-in slide-in-from-bottom-1 duration-300 font-medium">

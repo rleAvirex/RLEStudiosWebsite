@@ -29,7 +29,7 @@ export function CTABanner({ onBrowse }: CTABannerProps) {
                 Limited Time Bundle Deal
               </div>
               <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
-                Save up to <span className="text-primary">30%</span> on featured scripts
+                Save up to <span className="accent-gradient-text">30%</span> on featured scripts
               </h3>
               <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto lg:mx-0">
                 Bundle any 3 featured scripts and get an automatic 30% discount at checkout.
@@ -40,7 +40,7 @@ export function CTABanner({ onBrowse }: CTABannerProps) {
             <div className="flex flex-col sm:flex-row gap-3 shrink-0">
               <Button
                 size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-12 px-7 font-semibold"
+                className="btn-gradient-slide rounded-xl h-12 px-7 font-semibold"
                 onClick={onBrowse}
               >
                 Browse Scripts

@@ -99,7 +99,7 @@ export function Newsletter() {
                 />
                 <Button
                   type="submit"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-11 px-6 font-semibold"
+                  className="btn-gradient-slide rounded-xl h-11 px-6 font-semibold"
                   disabled={loading}
                 >
                   {loading ? (

@@ -100,7 +100,7 @@ export function LiveChatWidget() {
       {open && (
         <div className="fixed bottom-24 right-6 z-50 w-[340px] max-w-[calc(100vw-3rem)] h-[480px] max-h-[calc(100vh-8rem)] bg-card border border-border rounded-2xl shadow-2xl shadow-black/40 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
           {/* Header */}
-          <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between shrink-0">
+          <div className="accent-gradient text-white p-4 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-full bg-primary-foreground/20 flex items-center justify-center">
                 <Headphones className="h-4.5 w-4.5" />
@@ -169,7 +169,7 @@ export function LiveChatWidget() {
               />
               <Button
                 size="icon"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-9 w-9 shrink-0"
+                className="btn-gradient-slide btn-gradient-slide-sm rounded-lg h-9 w-9 shrink-0"
                 onClick={handleSend}
                 disabled={!input.trim()}
                 aria-label="Send message"
@@ -187,7 +187,7 @@ export function LiveChatWidget() {
       {/* Floating button */}
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:scale-110 transition-all flex items-center justify-center group"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full accent-gradient text-white shadow-lg glow-gradient hover:scale-110 transition-all flex items-center justify-center group"
         aria-label={open ? 'Close chat' : 'Open live chat'}
       >
         {open ? (
@@ -200,7 +200,7 @@ export function LiveChatWidget() {
                 1
               </span>
             )}
-            <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-20 group-hover:opacity-0" />
+            <span className="absolute inset-0 rounded-full bg-purple-500 animate-ping opacity-20 group-hover:opacity-0" />
           </>
         )}
       </button>

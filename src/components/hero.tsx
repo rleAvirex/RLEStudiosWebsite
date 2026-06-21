@@ -80,7 +80,7 @@ export function Hero() {
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
             >
               Elevate Your{' '}
-              <span className="text-primary">FiveM</span>
+              <span className="accent-gradient-text">FiveM</span>
               <br />
               Server
             </motion.h1>
@@ -101,7 +101,7 @@ export function Hero() {
             >
               <Button
                 size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 h-12 text-base font-semibold rounded-xl w-full sm:w-auto"
+                className="btn-gradient-slide px-8 h-12 text-base font-semibold rounded-xl w-full sm:w-auto"
                 onClick={() => {
                   document.getElementById('scripts')?.scrollIntoView({ behavior: 'smooth' })
                 }}
@@ -203,7 +203,7 @@ export function Hero() {
                 variants={floatingCard}
                 initial="hidden"
                 animate="show"
-                className="absolute top-32 left-6 px-4 py-2 rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 text-center"
+                className="absolute top-32 left-6 px-4 py-2 rounded-xl accent-gradient text-white shadow-lg glow-gradient text-center"
               >
                 <div className="text-[10px] font-medium uppercase tracking-wider opacity-80">
                   Save up to

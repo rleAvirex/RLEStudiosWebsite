@@ -11,8 +11,8 @@ export default function NotFound() {
       <div className="relative z-10 text-center max-w-md mx-auto">
         {/* 404 number */}
         <div className="relative inline-block mb-8">
-          <h1 className="text-8xl sm:text-9xl font-bold text-primary leading-none">404</h1>
-          <div className="absolute -top-2 -right-4 px-2 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold animate-bounce">
+          <h1 className="text-8xl sm:text-9xl font-bold accent-gradient-text leading-none">404</h1>
+          <div className="absolute -top-2 -right-4 px-2 py-1 rounded-full accent-gradient text-white text-xs font-semibold animate-bounce">
             LOL
           </div>
         </div>
@@ -32,7 +32,7 @@ export default function NotFound() {
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link href="/">
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl px-6 h-11 w-full sm:w-auto">
+            <Button className="btn-gradient-slide rounded-xl px-6 h-11 w-full sm:w-auto">
               <Home className="h-4 w-4 mr-2" />
               Back to Home
             </Button>
