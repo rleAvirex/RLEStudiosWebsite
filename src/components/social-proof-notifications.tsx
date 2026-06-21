@@ -66,7 +66,7 @@ export function SocialProofNotifications() {
 
   return (
     <div
-      className={`fixed bottom-6 left-6 z-40 max-w-[300px] transition-all duration-400 ${
+      className={`fixed bottom-24 left-6 z-40 max-w-[300px] transition-all duration-400 ${
         visible ? 'animate-slide-in-left' : 'animate-slide-out-left'
       }`}
     >

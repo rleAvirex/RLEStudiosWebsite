@@ -12,9 +12,9 @@ export function ImageWithShimmer({ src, alt, className = '' }: ImageWithShimmerP
   const [loaded, setLoaded] = useState(false)
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative overflow-hidden ${className}`}>
       {!loaded && (
-        <div className="absolute inset-0 shimmer rounded-lg" />
+        <div className="absolute inset-0 shimmer" />
       )}
       <img
         src={src}

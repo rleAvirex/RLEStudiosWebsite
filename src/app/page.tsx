@@ -16,6 +16,8 @@ import { DiscordWidget } from '@/components/discord-widget'
 import { AnnouncementBar } from '@/components/announcement-bar'
 import { CookieConsent } from '@/components/cookie-consent'
 import { SocialProofNotifications } from '@/components/social-proof-notifications'
+import { ScrollProgress } from '@/components/scroll-progress'
+import { LiveChatWidget } from '@/components/live-chat-widget'
 import { SkeletonGrid } from '@/components/skeleton-card'
 import { Features } from '@/components/sections/features'
 import { Testimonials } from '@/components/sections/testimonials'
@@ -25,7 +27,7 @@ import { CTABanner } from '@/components/sections/cta-banner'
 import { StatsBanner } from '@/components/sections/stats-banner'
 import { RecentlyViewed } from '@/components/sections/recently-viewed'
 import { BundleDeals } from '@/components/sections/bundle-deals'
-import { type Product, type Review, useRecentlyViewedStore } from '@/lib/store'
+import { type Product, type Review, useRecentlyViewedStore, useWishlistStore } from '@/lib/store'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -75,6 +77,7 @@ export default function Home() {
   const [sort, setSort] = useState<SortOption>('popular')
   const [quickFilter, setQuickFilter] = useState<QuickFilter>('all')
   const addRecentlyViewed = useRecentlyViewedStore((s) => s.add)
+  const wishlistToggle = useWishlistStore((s) => s.toggleItem)
 
   useEffect(() => {
     async function init() {
@@ -92,6 +95,26 @@ export default function Home() {
         setProducts(productsData)
         setFeatured(productsData.filter((p: Product) => p.isFeatured))
         setReviews(reviewsData)
+
+        // Parse ?wishlist= URL param and populate wishlist
+        try {
+          const urlParams = new URLSearchParams(window.location.search)
+          const wishlistParam = urlParams.get('wishlist')
+          if (wishlistParam) {
+            const ids = wishlistParam.split(',').filter(Boolean)
+            for (const id of ids) {
+              const product = productsData.find((p: Product) => p.id === id)
+              if (product) {
+                wishlistToggle(product)
+              }
+            }
+            // Clean URL — remove the wishlist param after processing
+            const newUrl = window.location.pathname
+            window.history.replaceState({}, '', newUrl)
+          }
+        } catch {
+          // ignore URL parsing errors
+        }
       } catch (error) {
         console.error('Error initializing:', error)
       } finally {
@@ -99,7 +122,7 @@ export default function Home() {
       }
     }
     init()
-  }, [])
+  }, [wishlistToggle])
 
   // Build review count map
   const reviewCounts = useMemo(() => {
@@ -385,10 +408,12 @@ export default function Home() {
       <Footer />
 
       {/* Floating elements */}
+      <ScrollProgress />
       <BackToTop />
       <DiscordWidget />
       <CookieConsent />
       <SocialProofNotifications />
+      <LiveChatWidget />
 
       {/* Overlays */}
       <CartSheet

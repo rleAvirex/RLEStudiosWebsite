@@ -24,6 +24,7 @@ import {
 } from '@/lib/store'
 import { toast } from '@/hooks/use-toast'
 import { ToastAction } from '@/components/ui/toast'
+import { ImageWithShimmer } from '@/components/image-with-shimmer'
 
 interface ProductCardProps {
   product: Product
@@ -128,12 +129,12 @@ export function ProductCard({ product, onViewDetail, featured, reviewCount = 0, 
     >
       {/* Product Image */}
       <div className="relative aspect-video bg-muted overflow-hidden">
-        <img
+        <ImageWithShimmer
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-card/90 via-card/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-card/90 via-card/20 to-transparent pointer-events-none" />
 
         {/* Top-left: Featured badge OR discount badge */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
