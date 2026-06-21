@@ -15,7 +15,6 @@ import { BackToTop } from '@/components/back-to-top'
 import { CookieConsent } from '@/components/cookie-consent'
 import { ScrollProgress } from '@/components/scroll-progress'
 import { SkeletonGrid } from '@/components/skeleton-card'
-import { Features } from '@/components/sections/features'
 import { FAQ } from '@/components/sections/faq'
 import { Newsletter } from '@/components/sections/newsletter'
 import { CTABanner } from '@/components/sections/cta-banner'
@@ -248,9 +247,6 @@ export default function Home() {
             </div>
           </section>
         )}
-
-        {/* Features / Why Choose Us */}
-        <Features />
 
         {/* Bundle Deals */}
         <BundleDeals products={products} onBrowse={scrollToScripts} />
