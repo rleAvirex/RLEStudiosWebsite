@@ -27,11 +27,10 @@ interface ProductCardProps {
   product: Product
   onViewDetail: (product: Product) => void
   onQuickView?: (product: Product) => void
-  featured?: boolean
   onCartOpen?: () => void
 }
 
-export function ProductCard({ product, onViewDetail, onQuickView, featured, onCartOpen }: ProductCardProps) {
+export function ProductCard({ product, onViewDetail, onQuickView, onCartOpen }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem)
   const toggleWishlist = useWishlistStore((s) => s.toggleItem)
   const isInWishlist = useWishlistStore((s) => s.ids.includes(product.id))
@@ -67,11 +66,7 @@ export function ProductCard({ product, onViewDetail, onQuickView, featured, onCa
 
   return (
     <Card
-      className={`group cursor-pointer bg-card border-border hover:border-primary/30 transition-all duration-300 overflow-hidden ${
-        featured
-          ? 'hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
-          : 'hover:shadow-md hover:shadow-primary/5'
-      }`}
+      className={`group cursor-pointer bg-card border-border hover:border-primary/30 transition-all duration-300 overflow-hidden hover:shadow-md hover:shadow-primary/5`}
       onClick={() => onViewDetail(product)}
     >
       {/* Product Image */}

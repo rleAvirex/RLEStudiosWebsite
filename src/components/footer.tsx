@@ -58,32 +58,11 @@ export function Footer() {
                 All Scripts
               </button>
               <button
-                onClick={() => document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors text-left flex items-center gap-1 group"
-              >
-                <ArrowRight className="h-3 w-3 opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all" />
-                Featured
-              </button>
-              <button
                 onClick={() => document.getElementById('bundles')?.scrollIntoView({ behavior: 'smooth' })}
                 className="text-sm text-muted-foreground hover:text-primary transition-colors text-left flex items-center gap-1 group"
               >
                 <ArrowRight className="h-3 w-3 opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all" />
                 Bundle Deals
-              </button>
-              <button
-                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors text-left flex items-center gap-1 group"
-              >
-                <ArrowRight className="h-3 w-3 opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all" />
-                Why Choose Us
-              </button>
-              <button
-                onClick={() => document.getElementById('testimonials')?.scrollIntoView({ behavior: 'smooth' })}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors text-left flex items-center gap-1 group"
-              >
-                <ArrowRight className="h-3 w-3 opacity-0 -ml-3 group-hover:opacity-100 group-hover:ml-0 transition-all" />
-                Reviews
               </button>
               <button
                 onClick={() => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' })}

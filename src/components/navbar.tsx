@@ -96,12 +96,6 @@ export function Navbar({
               Scripts
             </button>
             <button
-              onClick={() => scrollTo('featured')}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              Featured
-            </button>
-            <button
               onClick={() => scrollTo('faq')}
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
             >
@@ -193,12 +187,6 @@ export function Navbar({
               className="block w-full text-left px-2 py-2 text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               Scripts
-            </button>
-            <button
-              onClick={() => scrollTo('featured')}
-              className="block w-full text-left px-2 py-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              Featured
             </button>
             <button
               onClick={() => scrollTo('faq')}

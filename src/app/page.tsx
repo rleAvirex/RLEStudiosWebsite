@@ -32,7 +32,6 @@ import {
 import {
   Search,
   Filter,
-  Sparkles,
   ArrowDownUp,
   Flame,
   Clock,
@@ -55,7 +54,6 @@ const SORT_LABELS: Record<SortOption, string> = {
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([])
-  const [featured, setFeatured] = useState<Product[]>([])
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null)
   const [cartOpen, setCartOpen] = useState(false)
@@ -81,7 +79,6 @@ export default function Home() {
         const productsRes = await fetch('/api/products')
         const productsData = await productsRes.json()
         setProducts(productsData)
-        setFeatured(productsData.filter((p: Product) => p.isFeatured))
 
         // Parse ?wishlist= URL param and populate wishlist
         try {
@@ -206,47 +203,6 @@ export default function Home() {
 
       <main className="flex-1">
         <Hero />
-
-        {/* Featured Section */}
-        {featured.length > 0 && (
-          <section id="featured" className="py-16 sm:py-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    <span className="text-primary text-xs font-semibold uppercase tracking-widest">
-                      Hand-picked
-                    </span>
-                  </div>
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Featured Scripts</h2>
-                  <p className="text-muted-foreground text-sm mt-2">
-                    Our most popular and best-rated scripts, chosen by the community.
-                  </p>
-                </div>
-                <Button
-                  variant="ghost"
-                  className="text-muted-foreground hover:text-primary self-start sm:self-auto"
-                  onClick={scrollToScripts}
-                >
-                  View all
-                </Button>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                {featured.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onViewDetail={openDetail}
-                    onQuickView={openQuickView}
-                    featured
-                    onCartOpen={() => setCartOpen(true)}
-                  />
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* Bundle Deals */}
         <BundleDeals products={products} onBrowse={scrollToScripts} />

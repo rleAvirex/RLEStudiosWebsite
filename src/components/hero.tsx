@@ -103,7 +103,7 @@ export function Hero() {
                 size="lg"
                 className="border-border hover:border-primary/50 px-8 h-12 text-base rounded-xl w-full sm:w-auto"
                 onClick={() => {
-                  document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })
+                  document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' })
                 }}
               >
                 Learn More
@@ -204,7 +204,7 @@ export function Hero() {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
         onClick={() => {
-          document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' })
+          document.getElementById('scripts')?.scrollIntoView({ behavior: 'smooth' })
         }}
         className="absolute bottom-6 left-1/2 -translate-x-1/2 text-muted-foreground hover:text-primary transition-colors hidden sm:block"
         aria-label="Scroll down"
