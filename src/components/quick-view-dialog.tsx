@@ -9,7 +9,6 @@ import {
   Heart,
   Eye,
   X,
-  TrendingUp,
   ArrowRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -128,26 +127,13 @@ export function QuickViewDialog({
               <h2 className="text-lg font-bold leading-tight">{product.name}</h2>
             </div>
 
-            {/* Rating + Sales */}
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`h-3 w-3 ${
-                      i < Math.floor(product.rating)
-                        ? 'fill-primary text-primary'
-                        : 'text-muted-foreground/40'
-                    }`}
-                  />
-                ))}
-                <span className="font-medium ml-0.5">{product.rating.toFixed(1)}</span>
-              </div>
+            {/* Framework */}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Code className="h-3 w-3" />
+              {product.framework}
               <span>·</span>
-              <span className="flex items-center gap-0.5">
-                <TrendingUp className="h-3 w-3" />
-                {product.salesCount.toLocaleString()} sold
-              </span>
+              <Check className="h-3 w-3 text-green-500" />
+              v{product.version}
             </div>
 
             {/* Price */}

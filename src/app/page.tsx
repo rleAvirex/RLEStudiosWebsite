@@ -16,14 +16,12 @@ import { CookieConsent } from '@/components/cookie-consent'
 import { ScrollProgress } from '@/components/scroll-progress'
 import { SkeletonGrid } from '@/components/skeleton-card'
 import { Features } from '@/components/sections/features'
-import { Testimonials } from '@/components/sections/testimonials'
 import { FAQ } from '@/components/sections/faq'
 import { Newsletter } from '@/components/sections/newsletter'
 import { CTABanner } from '@/components/sections/cta-banner'
-import { StatsBanner } from '@/components/sections/stats-banner'
 import { RecentlyViewed } from '@/components/sections/recently-viewed'
 import { BundleDeals } from '@/components/sections/bundle-deals'
-import { type Product, type Review, useRecentlyViewedStore, useWishlistStore } from '@/lib/store'
+import { type Product, useRecentlyViewedStore, useWishlistStore } from '@/lib/store'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -59,7 +57,6 @@ const SORT_LABELS: Record<SortOption, string> = {
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([])
   const [featured, setFeatured] = useState<Product[]>([])
-  const [reviews, setReviews] = useState<Review[]>([])
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null)
   const [cartOpen, setCartOpen] = useState(false)
@@ -81,17 +78,11 @@ export default function Home() {
       try {
         await fetch('/api/seed', { method: 'POST' })
         await fetch('/api/promo-codes', { method: 'POST' })
-        await fetch('/api/reviews/seed', { method: 'POST' })
 
-        const [productsRes, reviewsRes] = await Promise.all([
-          fetch('/api/products'),
-          fetch('/api/reviews'),
-        ])
+        const productsRes = await fetch('/api/products')
         const productsData = await productsRes.json()
-        const reviewsData = await reviewsRes.json()
         setProducts(productsData)
         setFeatured(productsData.filter((p: Product) => p.isFeatured))
-        setReviews(reviewsData)
 
         // Parse ?wishlist= URL param and populate wishlist
         try {
@@ -121,14 +112,6 @@ export default function Home() {
     init()
   }, [wishlistToggle])
 
-  // Build review count map
-  const reviewCounts = useMemo(() => {
-    const counts: Record<string, number> = {}
-    for (const r of reviews) {
-      counts[r.productId] = (counts[r.productId] ?? 0) + 1
-    }
-    return counts
-  }, [reviews])
 
   // "New arrivals" = the 3 most recently created products
   const newArrivalIds = useMemo(() => {
@@ -225,9 +208,6 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
 
-        {/* Stats banner right after hero */}
-        <StatsBanner />
-
         {/* Featured Section */}
         {featured.length > 0 && (
           <section id="featured" className="py-16 sm:py-20">
@@ -261,7 +241,6 @@ export default function Home() {
                     onViewDetail={openDetail}
                     onQuickView={openQuickView}
                     featured
-                    reviewCount={reviewCounts[product.id] ?? 0}
                     onCartOpen={() => setCartOpen(true)}
                   />
                 ))}
@@ -393,7 +372,6 @@ export default function Home() {
                       product={product}
                       onViewDetail={openDetail}
                       onQuickView={openQuickView}
-                      reviewCount={reviewCounts[product.id] ?? 0}
                       onCartOpen={() => setCartOpen(true)}
                     />
                   ))}
@@ -405,9 +383,6 @@ export default function Home() {
 
         {/* CTA Banner */}
         <CTABanner onBrowse={scrollToScripts} />
-
-        {/* Testimonials */}
-        <Testimonials />
 
         {/* Recently Viewed */}
         <RecentlyViewed onViewDetail={openDetail} />
@@ -450,7 +425,6 @@ export default function Home() {
         product={selectedProduct}
         open={detailOpen}
         onOpenChange={setDetailOpen}
-        reviewCounts={reviewCounts}
         onCartOpen={() => setCartOpen(true)}
         allProducts={products}
       />

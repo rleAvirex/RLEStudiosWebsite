@@ -1,9 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ArrowDown, Star, ShieldCheck, Download } from 'lucide-react'
+import { ArrowDown, ShieldCheck, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { AnimatedCounter } from '@/components/animated-counter'
 
 const container = {
   hidden: { opacity: 0 },
@@ -124,10 +123,6 @@ export function Hero() {
                 <ShieldCheck className="h-3.5 w-3.5 text-primary" />
                 Secure checkout
               </span>
-              <span className="flex items-center gap-1.5">
-                <Star className="h-3.5 w-3.5 text-primary" />
-                4.9 / 5 rating
-              </span>
             </motion.div>
           </motion.div>
 
@@ -155,10 +150,7 @@ export function Hero() {
                     <span className="text-xs text-muted-foreground">Job</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <Star className="h-3 w-3 fill-primary text-primary" />
-                      <span className="text-xs font-medium">5.0</span>
-                    </div>
+                    <span className="text-xs text-muted-foreground">ESX / QBCore</span>
                     <span className="text-sm font-bold text-primary">€39.99</span>
                   </div>
                 </div>
@@ -201,51 +193,9 @@ export function Hero() {
                 </div>
                 <div className="text-lg font-bold leading-tight">30% OFF</div>
               </motion.div>
-
-              {/* Floating rating bubble */}
-              <motion.div
-                custom={3}
-                variants={floatingCard}
-                initial="hidden"
-                animate="show"
-                className="absolute bottom-0 right-12 px-3 py-2 rounded-xl bg-card border border-border shadow-lg flex items-center gap-2"
-              >
-                <div className="w-7 h-7 rounded-lg bg-primary/15 flex items-center justify-center">
-                  <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold">4.9 / 5</div>
-                  <div className="text-[10px] text-muted-foreground">2,800+ reviews</div>
-                </div>
-              </motion.div>
             </div>
           </div>
         </div>
-
-        {/* Stats strip */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          className="mt-12 lg:mt-16 grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto lg:mx-0"
-        >
-          <div className="text-center lg:text-left">
-            <div className="text-2xl sm:text-3xl font-bold text-primary">
-              <AnimatedCounter value={50} suffix="+" />
-            </div>
-            <div className="text-xs sm:text-sm text-muted-foreground mt-1">Scripts</div>
-          </div>
-          <div className="text-center lg:text-left border-y lg:border-y-0 lg:border-x border-border py-2 lg:py-0 lg:px-4">
-            <div className="text-2xl sm:text-3xl font-bold text-primary">
-              <AnimatedCounter value={2000} suffix="+" />
-            </div>
-            <div className="text-xs sm:text-sm text-muted-foreground mt-1">Customers</div>
-          </div>
-          <div className="text-center lg:text-left">
-            <div className="text-2xl sm:text-3xl font-bold text-primary">24/7</div>
-            <div className="text-xs sm:text-sm text-muted-foreground mt-1">Support</div>
-          </div>
-        </motion.div>
       </div>
 
       {/* Scroll indicator */}

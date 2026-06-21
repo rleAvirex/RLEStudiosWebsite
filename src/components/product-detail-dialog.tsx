@@ -35,13 +35,11 @@ import {
 } from '@/lib/store'
 import { toast } from '@/hooks/use-toast'
 import { ToastAction } from '@/components/ui/toast'
-import { ReviewsSection } from '@/components/reviews-section'
 
 interface ProductDetailDialogProps {
   product: Product | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  reviewCounts?: Record<string, number>
   onCartOpen?: () => void
   allProducts?: Product[]
 }
@@ -59,7 +57,6 @@ export function ProductDetailDialog({
   product,
   open,
   onOpenChange,
-  reviewCounts = {},
   onCartOpen,
   allProducts = [],
 }: ProductDetailDialogProps) {
@@ -99,8 +96,6 @@ export function ProductDetailDialog({
   const discountPercent = hasDiscount
     ? Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)
     : 0
-
-  const reviewCount = reviewCounts[product.id] ?? 0
 
   return (
     <Dialog
@@ -179,28 +174,14 @@ export function ProductDetailDialog({
                 </DialogTitle>
                 {/* Rating row */}
                 <div className="flex items-center gap-3 mt-2 flex-wrap">
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-3.5 w-3.5 ${
-                          i < Math.floor(product.rating)
-                            ? 'fill-primary text-primary'
-                            : 'text-muted-foreground/40'
-                        }`}
-                      />
-                    ))}
-                    <span className="text-sm font-medium ml-1">{product.rating.toFixed(1)}</span>
-                  </div>
-                  <span className="text-muted-foreground text-xs">·</span>
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     <MessageSquare className="h-3 w-3" />
-                    {reviewCount} review{reviewCount !== 1 ? 's' : ''}
+                    {product.framework}
                   </span>
                   <span className="text-muted-foreground text-xs">·</span>
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     <TrendingUp className="h-3 w-3" />
-                    {product.salesCount.toLocaleString()} sales
+                    v{product.version}
                   </span>
                 </div>
               </div>
@@ -361,12 +342,6 @@ export function ProductDetailDialog({
                             <h5 className="text-xs font-medium truncate group-hover:text-primary transition-colors">
                               {rp.name}
                             </h5>
-                            <div className="flex items-center gap-1 mt-0.5">
-                              <Star className="h-2.5 w-2.5 fill-primary text-primary" />
-                              <span className="text-[10px] text-muted-foreground">
-                                {rp.rating.toFixed(1)}
-                              </span>
-                            </div>
                             <div className="flex items-baseline gap-1 mt-0.5">
                               <span className="text-xs font-bold text-primary">
                                 {formatPrice(rp.price, currency)}
@@ -387,8 +362,6 @@ export function ProductDetailDialog({
             )
           })()}
 
-          {/* Reviews section */}
-          <ReviewsSection productId={product.id} />
         </div>
       </DialogContent>
     </Dialog>

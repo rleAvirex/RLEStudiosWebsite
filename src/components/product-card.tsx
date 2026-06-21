@@ -6,8 +6,6 @@ import {
   Code,
   Check,
   Heart,
-  TrendingUp,
-  MessageSquare,
   Tag,
   Eye,
 } from 'lucide-react'
@@ -30,11 +28,10 @@ interface ProductCardProps {
   onViewDetail: (product: Product) => void
   onQuickView?: (product: Product) => void
   featured?: boolean
-  reviewCount?: number
   onCartOpen?: () => void
 }
 
-export function ProductCard({ product, onViewDetail, onQuickView, featured, reviewCount = 0, onCartOpen }: ProductCardProps) {
+export function ProductCard({ product, onViewDetail, onQuickView, featured, onCartOpen }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem)
   const toggleWishlist = useWishlistStore((s) => s.toggleItem)
   const isInWishlist = useWishlistStore((s) => s.ids.includes(product.id))
@@ -67,37 +64,6 @@ export function ProductCard({ product, onViewDetail, onQuickView, featured, revi
 
 
   const hasDiscount = product.originalPrice && product.originalPrice > product.price
-  const discountPercent = hasDiscount
-    ? Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)
-    : 0
-
-  const renderStars = (rating: number) => {
-    return (
-      <div className="flex items-center gap-1">
-        <div className="flex items-center gap-0.5">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star
-              key={i}
-              className={`h-3 w-3 ${
-                i < Math.floor(rating)
-                  ? 'fill-primary text-primary'
-                  : i < rating
-                  ? 'fill-primary/50 text-primary/50'
-                  : 'text-muted-foreground/40'
-              }`}
-            />
-          ))}
-        </div>
-        <span className="text-xs text-muted-foreground">{rating.toFixed(1)}</span>
-        {reviewCount > 0 && (
-          <span className="text-xs text-muted-foreground flex items-center gap-0.5">
-            (<MessageSquare className="h-2.5 w-2.5" />
-            {reviewCount})
-          </span>
-        )}
-      </div>
-    )
-  }
 
   return (
     <Card
@@ -117,16 +83,13 @@ export function ProductCard({ product, onViewDetail, onQuickView, featured, revi
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card/90 via-card/20 to-transparent pointer-events-none" />
 
-        {/* Top-left: Featured badge OR discount badge */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+        {/* Top-left: Featured badge */}
+        <div className="absolute top-3 left-3">
           {product.isFeatured && (
             <Badge className="accent-gradient text-white text-xs w-fit border-0">
               <Star className="h-3 w-3 mr-1" />
               Featured
             </Badge>
-          )}
-          {hasDiscount && (
-            <Badge className="bg-red-500/90 text-white text-xs w-fit">-{discountPercent}%</Badge>
           )}
         </div>
 
@@ -169,12 +132,6 @@ export function ProductCard({ product, onViewDetail, onQuickView, featured, revi
             <Heart className={`h-4 w-4 ${isInWishlist ? 'fill-current' : ''}`} />
           </button>
         </div>
-
-        {/* Sales count */}
-        <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 rounded-md bg-card/80 backdrop-blur-sm text-xs text-muted-foreground">
-          <TrendingUp className="h-3 w-3 text-primary" />
-          {product.salesCount.toLocaleString()} sold
-        </div>
       </div>
 
       <CardContent className="p-4 space-y-3">
@@ -194,9 +151,6 @@ export function ProductCard({ product, onViewDetail, onQuickView, featured, revi
             )}
           </div>
         </div>
-
-        {/* Rating */}
-        {renderStars(product.rating)}
 
         {/* Description */}
         <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2 leading-relaxed">

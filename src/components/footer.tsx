@@ -170,9 +170,6 @@ export function Footer() {
             © {new Date().getFullYear()} RLE Studios. All rights reserved. Not affiliated with
             Rockstar Games or Take-Two Interactive.
           </p>
-          <p className="text-xs text-muted-foreground flex items-center gap-1">
-            Made with <Heart className="h-3 w-3 text-primary" /> for the FiveM community
-          </p>
         </div>
       </div>
     </footer>
