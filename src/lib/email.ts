@@ -1,12 +1,9 @@
-import { Resend } from 'resend'
-
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
-
+const RESEND_API_KEY = process.env.RESEND_API_KEY
 const FROM_ADDRESS =
   process.env.MAIL_FROM || 'RLE Studios <onboarding@resend.dev>'
 
 export function isEmailConfigured(): boolean {
-  return resend !== null
+  return !!RESEND_API_KEY
 }
 
 interface SendMagicCodeArgs {
@@ -15,25 +12,31 @@ interface SendMagicCodeArgs {
 }
 
 /**
- * Sends the magic login code via Resend.
- * Returns true if the email was sent (or skipped in dev), false on failure.
+ * Sends the magic login code via Resend REST API (raw fetch, no SDK).
+ * Uses fetch() directly to avoid bundling issues with the resend npm package
+ * on Vercel serverless functions.
  */
 export async function sendMagicCodeEmail({ to, code }: SendMagicCodeArgs): Promise<boolean> {
-  if (!resend) {
-    // No API key configured — callers should fall back to dev display.
-    return false
-  }
+  if (!RESEND_API_KEY) return false
 
   try {
-    const { error } = await resend.emails.send({
-      from: FROM_ADDRESS,
-      to,
-      subject: `Your RLE Studios login code: ${code}`,
-      html: renderMagicCodeEmail(code),
-      text: `Your RLE Studios login code is ${code}. It expires in 10 minutes.`,
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: FROM_ADDRESS,
+        to,
+        subject: `Your RLE Studios login code: ${code}`,
+        html: renderMagicCodeEmail(code),
+        text: `Your RLE Studios login code is ${code}. It expires in 10 minutes.`,
+      }),
     })
 
-    return !error
+    const data = await res.json()
+    return res.ok
   } catch {
     return false
   }
