@@ -14,7 +14,6 @@ import { MyOrdersSheet } from '@/components/my-orders-sheet'
 import { Footer } from '@/components/footer'
 import { BackToTop } from '@/components/back-to-top'
 import { DiscordWidget } from '@/components/discord-widget'
-import { AnnouncementBar } from '@/components/announcement-bar'
 import { CookieConsent } from '@/components/cookie-consent'
 import { SocialProofNotifications } from '@/components/social-proof-notifications'
 import { ScrollProgress } from '@/components/scroll-progress'
@@ -220,7 +219,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <AnnouncementBar />
       <Navbar
         onCartOpen={() => setCartOpen(true)}
         onWishlistOpen={() => setWishlistOpen(true)}
