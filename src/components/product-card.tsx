@@ -10,6 +10,7 @@ import {
   GitCompare,
   MessageSquare,
   Tag,
+  Eye,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -29,12 +30,13 @@ import { ImageWithShimmer } from '@/components/image-with-shimmer'
 interface ProductCardProps {
   product: Product
   onViewDetail: (product: Product) => void
+  onQuickView?: (product: Product) => void
   featured?: boolean
   reviewCount?: number
   onCartOpen?: () => void
 }
 
-export function ProductCard({ product, onViewDetail, featured, reviewCount = 0, onCartOpen }: ProductCardProps) {
+export function ProductCard({ product, onViewDetail, onQuickView, featured, reviewCount = 0, onCartOpen }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem)
   const toggleWishlist = useWishlistStore((s) => s.toggleItem)
   const isInWishlist = useWishlistStore((s) => s.ids.includes(product.id))
@@ -156,6 +158,22 @@ export function ProductCard({ product, onViewDetail, featured, reviewCount = 0, 
         >
           {product.category}
         </Badge>
+
+        {/* Quick View overlay button — center, appears on hover */}
+        {onQuickView && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onQuickView(product)
+            }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-2 rounded-xl bg-card/90 backdrop-blur-md text-foreground text-xs font-semibold flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-primary hover:text-primary-foreground shadow-lg"
+            aria-label="Quick view"
+            title="Quick view"
+          >
+            <Eye className="h-3.5 w-3.5" />
+            Quick View
+          </button>
+        )}
 
         {/* Action buttons - bottom right */}
         <div className="absolute bottom-3 right-3 flex items-center gap-1.5">

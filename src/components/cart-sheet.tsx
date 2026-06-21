@@ -232,6 +232,11 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
                   <span>Total</span>
                   <span className="text-primary">{formatPrice(finalTotal(), currency)}</span>
                 </div>
+                {currency !== 'EUR' && (
+                  <p className="text-[10px] text-muted-foreground italic">
+                    * Prices include currency conversion. Final charge in EUR at checkout.
+                  </p>
+                )}
               </div>
 
               <Button

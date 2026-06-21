@@ -16,6 +16,8 @@ import {
   GitCompare,
   MessageSquare,
   Tag,
+  Sparkles,
+  Play,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -43,6 +45,7 @@ interface ProductDetailDialogProps {
   onOpenChange: (open: boolean) => void
   reviewCounts?: Record<string, number>
   onCartOpen?: () => void
+  allProducts?: Product[]
 }
 
 // Build gallery images from a single product image
@@ -60,6 +63,7 @@ export function ProductDetailDialog({
   onOpenChange,
   reviewCounts = {},
   onCartOpen,
+  allProducts = [],
 }: ProductDetailDialogProps) {
   const [activeImage, setActiveImage] = useState(0)
   const addItem = useCartStore((s) => s.addItem)
@@ -168,6 +172,21 @@ export function ProductDetailDialog({
             <div className="absolute bottom-3 right-3 px-2 py-0.5 rounded-md bg-card/80 backdrop-blur-sm text-[10px] text-muted-foreground">
               {activeImage + 1} / {galleryImages.length}
             </div>
+            {/* Preview video play button overlay */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                toast({
+                  title: 'Preview video',
+                  description: 'Video preview would play here in production.',
+                })
+              }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-primary/90 hover:bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/30 hover:scale-110 transition-all"
+              aria-label="Play preview video"
+              title="Play preview video"
+            >
+              <Play className="h-6 w-6 fill-current ml-0.5" />
+            </button>
           </div>
         </div>
 
@@ -330,6 +349,80 @@ export function ProductDetailDialog({
               <Heart className={`h-5 w-5 ${isInWishlist ? 'fill-current' : ''}`} />
             </Button>
           </div>
+
+          {/* Related Products section */}
+          {allProducts.length > 1 && (() => {
+            const related = allProducts
+              .filter(
+                (p) =>
+                  p.id !== product.id &&
+                  (p.category === product.category ||
+                    p.framework === product.framework ||
+                    (product.tags && p.tags && p.tags.some((t) => product.tags.includes(t))))
+              )
+              .slice(0, 3)
+
+            if (related.length === 0) return null
+
+            return (
+              <div className="space-y-3 pt-2 border-t border-border">
+                <h4 className="text-sm font-semibold flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  Related Scripts
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {related.map((rp) => {
+                    const rpHasDiscount = rp.originalPrice && rp.originalPrice > rp.price
+                    return (
+                      <button
+                        key={rp.id}
+                        onClick={() => {
+                          onOpenChange(false)
+                          setTimeout(() => {
+                            // Re-open with the related product
+                            const event = new CustomEvent('openProduct', { detail: rp })
+                            window.dispatchEvent(event)
+                          }, 100)
+                        }}
+                        className="text-left p-3 rounded-xl bg-muted/40 hover:bg-muted hover:border-primary/30 border border-border transition-all group"
+                      >
+                        <div className="flex gap-3">
+                          <div className="w-14 h-14 rounded-lg overflow-hidden bg-muted shrink-0">
+                            <img
+                              src={rp.image}
+                              alt={rp.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h5 className="text-xs font-medium truncate group-hover:text-primary transition-colors">
+                              {rp.name}
+                            </h5>
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <Star className="h-2.5 w-2.5 fill-primary text-primary" />
+                              <span className="text-[10px] text-muted-foreground">
+                                {rp.rating.toFixed(1)}
+                              </span>
+                            </div>
+                            <div className="flex items-baseline gap-1 mt-0.5">
+                              <span className="text-xs font-bold text-primary">
+                                {formatPrice(rp.price, currency)}
+                              </span>
+                              {rpHasDiscount && (
+                                <span className="text-[10px] text-muted-foreground line-through">
+                                  {formatPrice(rp.originalPrice!, currency)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })()}
 
           {/* Reviews section */}
           <ReviewsSection productId={product.id} />

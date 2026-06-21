@@ -5,6 +5,7 @@ import { Navbar } from '@/components/navbar'
 import { Hero } from '@/components/hero'
 import { ProductCard } from '@/components/product-card'
 import { ProductDetailDialog } from '@/components/product-detail-dialog'
+import { QuickViewDialog } from '@/components/quick-view-dialog'
 import { CartSheet } from '@/components/cart-sheet'
 import { WishlistSheet } from '@/components/wishlist-sheet'
 import { CheckoutDialog } from '@/components/checkout-dialog'
@@ -65,10 +66,12 @@ export default function Home() {
   const [featured, setFeatured] = useState<Product[]>([])
   const [reviews, setReviews] = useState<Review[]>([])
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null)
   const [cartOpen, setCartOpen] = useState(false)
   const [wishlistOpen, setWishlistOpen] = useState(false)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
+  const [quickViewOpen, setQuickViewOpen] = useState(false)
   const [compareOpen, setCompareOpen] = useState(false)
   const [ordersOpen, setOrdersOpen] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -159,6 +162,23 @@ export default function Home() {
     addRecentlyViewed(product)
   }
 
+  const openQuickView = (product: Product) => {
+    setQuickViewProduct(product)
+    setQuickViewOpen(true)
+  }
+
+  // Listen for "openProduct" custom events (from Related Products clicks)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const customEvent = e as CustomEvent<Product>
+      if (customEvent.detail) {
+        openDetail(customEvent.detail)
+      }
+    }
+    window.addEventListener('openProduct', handler)
+    return () => window.removeEventListener('openProduct', handler)
+  }, [])
+
   const filteredProducts = products
     .filter((p) => {
       const matchesSearch =
@@ -247,6 +267,7 @@ export default function Home() {
                     key={product.id}
                     product={product}
                     onViewDetail={openDetail}
+                    onQuickView={openQuickView}
                     featured
                     reviewCount={reviewCounts[product.id] ?? 0}
                     onCartOpen={() => setCartOpen(true)}
@@ -379,6 +400,7 @@ export default function Home() {
                       key={product.id}
                       product={product}
                       onViewDetail={openDetail}
+                      onQuickView={openQuickView}
                       reviewCount={reviewCounts[product.id] ?? 0}
                       onCartOpen={() => setCartOpen(true)}
                     />
@@ -433,12 +455,20 @@ export default function Home() {
       />
       <MyOrdersSheet open={ordersOpen} onOpenChange={setOrdersOpen} />
       <CheckoutDialog open={checkoutOpen} onOpenChange={setCheckoutOpen} />
+      <QuickViewDialog
+        product={quickViewProduct}
+        open={quickViewOpen}
+        onOpenChange={setQuickViewOpen}
+        onViewFullDetail={openDetail}
+        onCartOpen={() => setCartOpen(true)}
+      />
       <ProductDetailDialog
         product={selectedProduct}
         open={detailOpen}
         onOpenChange={setDetailOpen}
         reviewCounts={reviewCounts}
         onCartOpen={() => setCartOpen(true)}
+        allProducts={products}
       />
     </div>
   )

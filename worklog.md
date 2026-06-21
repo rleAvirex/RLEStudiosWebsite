@@ -510,3 +510,78 @@ Unresolved / Next Steps:
 - Could add search results page with filters
 - Could add admin dashboard for viewing orders/stats
 - Note: dev server requires manual restart when Prisma schema changes (recurring issue since Task ID 2)
+
+---
+Task ID: 8
+Agent: Cron Review Agent (Round 7)
+Task: QA test the site, then add more features and improve styling per user request
+
+Work Log:
+- Reviewed worklog.md — site was stable from Task ID 7 with scroll progress, live chat, ImageWithShimmer, wishlist URL parsing, custom 404, enhanced footer
+- Ran ESLint check — passes clean
+- QA tested with agent-browser: confirmed all existing features functional
+- Selected work focus: Quick View modal, related products, preview video, admin dashboard, currency fee notice
+
+New components:
+- QuickViewDialog (src/components/quick-view-dialog.tsx) — mini product preview in a 2-column grid (image + info), shows category badge, title, rating, sales, price, short description (3 lines), top 3 features, Add to Cart + View Details + Compare + Wishlist buttons, "Quick View" badge on image, uses ImageWithShimmer
+- AdminPage (src/app/admin/page.tsx) — server-side rendered admin dashboard with 8 stat cards (Total Revenue, Total Orders, Items Sold, Avg Order Value, Products, Reviews, Newsletter Subs, Avg Rating), each with trend indicator (+/-), Top Selling Products list (ranked 1-5), Recent Orders list (last 10), Promo Code Usage grid (all promo codes with use counts), uses direct Prisma queries
+
+Enhanced existing components:
+- ProductCard: added onQuickView optional prop, added "Quick View" overlay button (center of image, appears on hover, Eye icon), passes onQuickView to all card instances
+- ProductDetailDialog: added allProducts prop, added "Related Scripts" section (shows up to 3 related products filtered by same category/framework/shared tags, each with thumbnail/name/rating/price, clicking dispatches CustomEvent 'openProduct' to re-open dialog with related product), added Play preview video button overlay on main image (orange circle with Play icon, shows toast on click), imported Sparkles + Play icons
+- CartSheet: added currency conversion fee notice ("* Prices include currency conversion. Final charge in EUR at checkout.") shown only when currency is not EUR
+- page.tsx: added quickViewProduct + quickViewOpen state, openQuickView handler, useEffect listener for 'openProduct' custom events (from Related Products clicks), passes onQuickView to featured + scripts ProductCards, passes allProducts to ProductDetailDialog, wired QuickViewDialog
+
+Related Products logic:
+- Filters allProducts by: same category OR same framework OR shared tags
+- Excludes current product
+- Shows up to 3 related products
+- Clicking a related product closes current dialog and opens new one via CustomEvent
+
+Quick View flow:
+1. User hovers over product card → "Quick View" button appears in center of image
+2. User clicks Quick View → QuickViewDialog opens (2-column mini preview)
+3. User can: Add to Cart (closes dialog + adds), View Details (closes QuickView + opens full ProductDetailDialog), Compare, or Wishlist
+4. Quick and lightweight — no full page load needed
+
+Admin Dashboard features:
+- 8 stat cards with trend indicators (green up arrow, red down arrow, neutral)
+- Top Selling Products (ranked list with count + revenue)
+- Recent Orders (last 10 with customer name, email, items, total, date)
+- Promo Code Usage (grid of all promo codes with use counts)
+- Server-side rendered with direct Prisma queries (no client-side fetching)
+- "Live Data" badge in header
+
+QA verification via agent-browser:
+- Quick View button: appears on product card hover (verified in snapshot — "Quick view" button ref present)
+- Quick View dialog: clicking opens mini preview with product name, price, Add to Cart, View Details, Compare, Wishlist buttons, "Quick View" badge on image
+- View Details from QuickView: clicking opens full ProductDetailDialog
+- Related Products: visible in ProductDetailDialog ("Related Scripts" heading with 3 related products — Custom HUD UI, Advanced Banking, Police MDT System for Advanced Garage System)
+- Related product navigation: clicking Custom HUD UI in related list → dialog reopens with Custom HUD UI and its own related products (Advanced Garage System, etc.)
+- Preview video button: "Play preview video" button visible on main image in detail dialog
+- Admin dashboard: visiting /admin shows 8 stat cards (Products: 9, Reviews: 21, Avg Rating: 4.8/5), Top Selling Products, Recent Orders, Promo Code Usage sections
+- Currency fee notice: switching to USD + adding item to cart + opening cart → "* Prices include currency conversion. Final charge in EUR at checkout." visible
+- All previously working features still functional
+
+Stage Summary:
+- Site now has 6 major new features: Quick View modal, Related Products in detail dialog, Preview video button, Admin Dashboard (/admin), Currency conversion fee notice, ImageWithShimmer in QuickView
+- Visual polish: Quick View hover button, related products cards with thumbnails, preview video play button overlay, admin dashboard with trend indicators, currency fee notice
+- Backend: admin page uses server-side Prisma queries for real-time data
+- All ESLint checks pass
+- All QA tests passed: Quick View (open + view details), Related Products (display + navigation), Preview video button, Admin dashboard (8 stats + sections), Currency fee notice
+
+Unresolved / Next Steps:
+- Could add user accounts/authentication (NextAuth.js available) to protect admin page
+- Could add admin CRUD for products, promo codes, bundles
+- Could add actual file delivery / download center for purchased scripts
+- Could add multiple real images per product (currently simulates with same image 3×)
+- Could add live chat integration with real agent/AI (currently auto-response simulation)
+- Could add email notifications for newsletter subscribers
+- Could add "verified purchase" badge on reviews (requires order email matching)
+- Could add product comparison matrix view (table format)
+- Could add search results page with filters
+- Could add admin charts/graphs for revenue over time
+- Could add export functionality for orders (CSV/Excel)
+- Could add product video preview (actual video instead of placeholder)
+- Could integrate ImageWithShimmer into CompareSheet, WishlistSheet, RecentlyViewed
+- Note: dev server requires manual restart when Prisma schema changes (recurring issue since Task ID 2)
