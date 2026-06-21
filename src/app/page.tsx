@@ -13,9 +13,7 @@ import { CompareSheet } from '@/components/compare-sheet'
 import { MyOrdersSheet } from '@/components/my-orders-sheet'
 import { Footer } from '@/components/footer'
 import { BackToTop } from '@/components/back-to-top'
-import { DiscordWidget } from '@/components/discord-widget'
 import { CookieConsent } from '@/components/cookie-consent'
-import { SocialProofNotifications } from '@/components/social-proof-notifications'
 import { ScrollProgress } from '@/components/scroll-progress'
 import { LiveChatWidget } from '@/components/live-chat-widget'
 import { SkeletonGrid } from '@/components/skeleton-card'
@@ -430,9 +428,7 @@ export default function Home() {
       {/* Floating elements */}
       <ScrollProgress />
       <BackToTop />
-      <DiscordWidget />
       <CookieConsent />
-      <SocialProofNotifications />
       <LiveChatWidget />
 
       {/* Overlays */}
