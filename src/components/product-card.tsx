@@ -1,10 +1,18 @@
 'use client'
 
-import { ShoppingCart, Star, Code, Check, Heart, TrendingUp } from 'lucide-react'
+import {
+  ShoppingCart,
+  Star,
+  Code,
+  Check,
+  Heart,
+  TrendingUp,
+  GitCompare,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { type Product, useCartStore, useWishlistStore } from '@/lib/store'
+import { type Product, useCartStore, useWishlistStore, useCompareStore } from '@/lib/store'
 import { toast } from '@/hooks/use-toast'
 
 interface ProductCardProps {
@@ -17,6 +25,9 @@ export function ProductCard({ product, onViewDetail, featured }: ProductCardProp
   const addItem = useCartStore((s) => s.addItem)
   const toggleWishlist = useWishlistStore((s) => s.toggleItem)
   const isInWishlist = useWishlistStore((s) => s.ids.includes(product.id))
+  const toggleCompare = useCompareStore((s) => s.toggleItem)
+  const isInCompare = useCompareStore((s) => s.ids.includes(product.id))
+  const compareCount = useCompareStore((s) => s.ids.length)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -36,12 +47,26 @@ export function ProductCard({ product, onViewDetail, featured }: ProductCardProp
     })
   }
 
-  const hasDiscount =
-    product.originalPrice && product.originalPrice > product.price
+  const handleToggleCompare = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!isInCompare && compareCount >= 3) {
+      toast({
+        title: 'Compare list full',
+        description: 'Remove an item from compare to add another (max 3).',
+        variant: 'destructive',
+      })
+      return
+    }
+    toggleCompare(product)
+    toast({
+      title: isInCompare ? 'Removed from compare' : 'Added to compare',
+      description: product.name,
+    })
+  }
+
+  const hasDiscount = product.originalPrice && product.originalPrice > product.price
   const discountPercent = hasDiscount
-    ? Math.round(
-        ((product.originalPrice! - product.price) / product.originalPrice!) * 100
-      )
+    ? Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)
     : 0
 
   const renderStars = (rating: number) => {
@@ -59,9 +84,7 @@ export function ProductCard({ product, onViewDetail, featured }: ProductCardProp
             }`}
           />
         ))}
-        <span className="text-xs text-muted-foreground ml-1">
-          {rating.toFixed(1)}
-        </span>
+        <span className="text-xs text-muted-foreground ml-1">{rating.toFixed(1)}</span>
       </div>
     )
   }
@@ -69,8 +92,10 @@ export function ProductCard({ product, onViewDetail, featured }: ProductCardProp
   return (
     <Card
       className={`group cursor-pointer bg-card border-border hover:border-primary/30 transition-all duration-300 overflow-hidden ${
-        featured ? 'hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1' : 'hover:shadow-md hover:shadow-primary/5'
-      }`}
+        featured
+          ? 'hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
+          : 'hover:shadow-md hover:shadow-primary/5'
+      } ${isInCompare ? 'ring-1 ring-primary/40' : ''}`}
       onClick={() => onViewDetail(product)}
     >
       {/* Product Image */}
@@ -91,9 +116,7 @@ export function ProductCard({ product, onViewDetail, featured }: ProductCardProp
             </Badge>
           )}
           {hasDiscount && (
-            <Badge className="bg-red-500/90 text-white text-xs w-fit">
-              -{discountPercent}%
-            </Badge>
+            <Badge className="bg-red-500/90 text-white text-xs w-fit">-{discountPercent}%</Badge>
           )}
         </div>
 
@@ -105,18 +128,33 @@ export function ProductCard({ product, onViewDetail, featured }: ProductCardProp
           {product.category}
         </Badge>
 
-        {/* Wishlist heart */}
-        <button
-          onClick={handleToggleWishlist}
-          className={`absolute bottom-3 right-3 w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all ${
-            isInWishlist
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-card/80 text-muted-foreground hover:text-primary'
-          }`}
-          aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-        >
-          <Heart className={`h-4 w-4 ${isInWishlist ? 'fill-current' : ''}`} />
-        </button>
+        {/* Action buttons - bottom right */}
+        <div className="absolute bottom-3 right-3 flex items-center gap-1.5">
+          <button
+            onClick={handleToggleCompare}
+            className={`w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all ${
+              isInCompare
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-card/80 text-muted-foreground hover:text-primary'
+            }`}
+            aria-label={isInCompare ? 'Remove from compare' : 'Add to compare'}
+            title="Compare"
+          >
+            <GitCompare className="h-4 w-4" />
+          </button>
+          <button
+            onClick={handleToggleWishlist}
+            className={`w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all ${
+              isInWishlist
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-card/80 text-muted-foreground hover:text-primary'
+            }`}
+            aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+            title="Wishlist"
+          >
+            <Heart className={`h-4 w-4 ${isInWishlist ? 'fill-current' : ''}`} />
+          </button>
+        </div>
 
         {/* Sales count */}
         <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 rounded-md bg-card/80 backdrop-blur-sm text-xs text-muted-foreground">

@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Download,
   RefreshCw,
+  GitCompare,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -21,7 +22,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { type Product, useCartStore, useWishlistStore } from '@/lib/store'
+import {
+  type Product,
+  useCartStore,
+  useWishlistStore,
+  useCompareStore,
+} from '@/lib/store'
 import { toast } from '@/hooks/use-toast'
 
 interface ProductDetailDialogProps {
@@ -33,9 +39,10 @@ interface ProductDetailDialogProps {
 export function ProductDetailDialog({ product, open, onOpenChange }: ProductDetailDialogProps) {
   const addItem = useCartStore((s) => s.addItem)
   const toggleWishlist = useWishlistStore((s) => s.toggleItem)
-  const isInWishlist = useWishlistStore((s) =>
-    product ? s.ids.includes(product.id) : false
-  )
+  const isInWishlist = useWishlistStore((s) => (product ? s.ids.includes(product.id) : false))
+  const toggleCompare = useCompareStore((s) => s.toggleItem)
+  const isInCompare = useCompareStore((s) => (product ? s.ids.includes(product.id) : false))
+  const compareCount = useCompareStore((s) => s.ids.length)
 
   if (!product) return null
 
@@ -55,12 +62,25 @@ export function ProductDetailDialog({ product, open, onOpenChange }: ProductDeta
     })
   }
 
-  const hasDiscount =
-    product.originalPrice && product.originalPrice > product.price
+  const handleToggleCompare = () => {
+    if (!isInCompare && compareCount >= 3) {
+      toast({
+        title: 'Compare list full',
+        description: 'Remove an item from compare to add another (max 3).',
+        variant: 'destructive',
+      })
+      return
+    }
+    toggleCompare(product)
+    toast({
+      title: isInCompare ? 'Removed from compare' : 'Added to compare',
+      description: product.name,
+    })
+  }
+
+  const hasDiscount = product.originalPrice && product.originalPrice > product.price
   const discountPercent = hasDiscount
-    ? Math.round(
-        ((product.originalPrice! - product.price) / product.originalPrice!) * 100
-      )
+    ? Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)
     : 0
 
   return (
@@ -107,9 +127,7 @@ export function ProductDetailDialog({ product, open, onOpenChange }: ProductDeta
                         }`}
                       />
                     ))}
-                    <span className="text-sm font-medium ml-1">
-                      {product.rating.toFixed(1)}
-                    </span>
+                    <span className="text-sm font-medium ml-1">{product.rating.toFixed(1)}</span>
                   </div>
                   <span className="text-muted-foreground text-xs">·</span>
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -202,11 +220,25 @@ export function ProductDetailDialog({ product, open, onOpenChange }: ProductDeta
               variant="outline"
               size="lg"
               className={`rounded-xl px-4 ${
+                isInCompare
+                  ? 'border-primary text-primary'
+                  : 'border-border text-muted-foreground hover:text-primary hover:border-primary/40'
+              }`}
+              onClick={handleToggleCompare}
+              title="Compare"
+            >
+              <GitCompare className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className={`rounded-xl px-4 ${
                 isInWishlist
                   ? 'border-primary text-primary'
                   : 'border-border text-muted-foreground hover:text-primary hover:border-primary/40'
               }`}
               onClick={handleToggleWishlist}
+              title="Wishlist"
             >
               <Heart className={`h-5 w-5 ${isInWishlist ? 'fill-current' : ''}`} />
             </Button>

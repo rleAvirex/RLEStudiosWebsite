@@ -8,7 +8,10 @@ import { ProductDetailDialog } from '@/components/product-detail-dialog'
 import { CartSheet } from '@/components/cart-sheet'
 import { WishlistSheet } from '@/components/wishlist-sheet'
 import { CheckoutDialog } from '@/components/checkout-dialog'
+import { CompareSheet } from '@/components/compare-sheet'
+import { MyOrdersSheet } from '@/components/my-orders-sheet'
 import { Footer } from '@/components/footer'
+import { BackToTop } from '@/components/back-to-top'
 import { Features } from '@/components/sections/features'
 import { Testimonials } from '@/components/sections/testimonials'
 import { FAQ } from '@/components/sections/faq'
@@ -48,6 +51,8 @@ export default function Home() {
   const [wishlistOpen, setWishlistOpen] = useState(false)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
+  const [compareOpen, setCompareOpen] = useState(false)
+  const [ordersOpen, setOrdersOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
@@ -58,6 +63,8 @@ export default function Home() {
     async function init() {
       try {
         await fetch('/api/seed', { method: 'POST' })
+        // Also seed promo codes
+        await fetch('/api/promo-codes', { method: 'POST' })
         const res = await fetch('/api/products')
         const data = await res.json()
         setProducts(data)
@@ -97,7 +104,7 @@ export default function Home() {
           return b.rating - a.rating
         case 'newest':
         default:
-          return 0 // Keep original order (already desc by createdAt)
+          return 0
       }
     })
 
@@ -110,6 +117,10 @@ export default function Home() {
       <Navbar
         onCartOpen={() => setCartOpen(true)}
         onWishlistOpen={() => setWishlistOpen(true)}
+        onOrdersOpen={() => setOrdersOpen(true)}
+        onCompareOpen={() => setCompareOpen(true)}
+        products={products}
+        onProductClick={openDetail}
       />
 
       <main className="flex-1">
@@ -130,9 +141,7 @@ export default function Home() {
                       Hand-picked
                     </span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
-                    Featured Scripts
-                  </h2>
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Featured Scripts</h2>
                   <p className="text-muted-foreground text-sm mt-2">
                     Our most popular and best-rated scripts, chosen by the community.
                   </p>
@@ -284,6 +293,9 @@ export default function Home() {
 
       <Footer />
 
+      {/* Floating elements */}
+      <BackToTop />
+
       {/* Overlays */}
       <CartSheet
         open={cartOpen}
@@ -295,6 +307,12 @@ export default function Home() {
         onOpenChange={setWishlistOpen}
         onViewDetail={openDetail}
       />
+      <CompareSheet
+        open={compareOpen}
+        onOpenChange={setCompareOpen}
+        onViewDetail={openDetail}
+      />
+      <MyOrdersSheet open={ordersOpen} onOpenChange={setOrdersOpen} />
       <CheckoutDialog open={checkoutOpen} onOpenChange={setCheckoutOpen} />
       <ProductDetailDialog
         product={selectedProduct}

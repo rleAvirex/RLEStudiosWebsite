@@ -13,6 +13,9 @@ interface OrderRequestBody {
   name: string
   items: OrderItemInput[]
   totalPrice: number
+  subtotal?: number
+  discount?: number
+  promoCode?: string
 }
 
 export async function POST(request: Request) {
@@ -26,11 +29,27 @@ export async function POST(request: Request) {
       )
     }
 
+    // If promo code provided, validate it once more and increment usage
+    if (body.promoCode) {
+      const promo = await db.promoCode.findUnique({
+        where: { code: body.promoCode.toUpperCase() },
+      })
+      if (promo && promo.isActive) {
+        await db.promoCode.update({
+          where: { id: promo.id },
+          data: { usesCount: { increment: 1 } },
+        })
+      }
+    }
+
     const order = await db.order.create({
       data: {
         email: body.email,
         name: body.name,
         totalPrice: body.totalPrice,
+        subtotal: body.subtotal ?? body.totalPrice,
+        discount: body.discount ?? 0,
+        promoCode: body.promoCode?.toUpperCase() ?? null,
         status: 'completed',
         items: {
           create: body.items.map((item) => ({

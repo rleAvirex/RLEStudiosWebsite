@@ -1,7 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2, Check, ShieldCheck, Download, Mail, User, CreditCard } from 'lucide-react'
+import {
+  Loader2,
+  Check,
+  ShieldCheck,
+  Download,
+  Mail,
+  User,
+  CreditCard,
+  Tag,
+  X,
+  Gift,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,7 +23,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
-import { useCartStore } from '@/lib/store'
+import { useCartStore, useMyOrdersStore } from '@/lib/store'
+import { toast } from '@/hooks/use-toast'
 
 interface CheckoutDialogProps {
   open: boolean
@@ -22,12 +34,24 @@ interface CheckoutDialogProps {
 type Step = 'details' | 'processing' | 'success'
 
 export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
-  const { items, totalPrice, totalSavings, clearCart } = useCartStore()
+  const {
+    items,
+    subtotal,
+    bundleDiscount,
+    hasBundleDeal,
+    promo,
+    setPromo,
+    finalTotal,
+    clearCart,
+  } = useCartStore()
+  const addOrder = useMyOrdersStore((s) => s.addOrder)
   const [step, setStep] = useState<Step>('details')
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [orderId, setOrderId] = useState('')
   const [error, setError] = useState('')
+  const [promoInput, setPromoInput] = useState('')
+  const [promoLoading, setPromoLoading] = useState(false)
 
   const reset = () => {
     setStep('details')
@@ -35,13 +59,56 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
     setName('')
     setOrderId('')
     setError('')
+    setPromoInput('')
   }
 
   const handleClose = (open: boolean) => {
     onOpenChange(open)
     if (!open) {
-      // Delay reset to allow close animation
       setTimeout(reset, 200)
+    }
+  }
+
+  const handleApplyPromo = async () => {
+    setError('')
+    if (!promoInput.trim()) {
+      setError('Enter a promo code')
+      return
+    }
+    // Calculate subtotal after bundle discount (promo applies to post-bundle total)
+    const afterBundle = subtotal() - bundleDiscount()
+    setPromoLoading(true)
+    try {
+      const res = await fetch('/api/promo-codes/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: promoInput,
+          subtotal: afterBundle,
+        }),
+      })
+      const data = await res.json()
+
+      if (data.valid) {
+        setPromo({
+          code: data.code,
+          description: data.description,
+          discountType: data.discountType,
+          discountValue: data.discountValue,
+          discount: data.discount,
+        })
+        setPromoInput('')
+        toast({
+          title: 'Promo applied!',
+          description: `${data.code}: ${data.description}`,
+        })
+      } else {
+        setError(data.error || 'Invalid promo code')
+      }
+    } catch {
+      setError('Failed to validate promo code')
+    } finally {
+      setPromoLoading(false)
     }
   }
 
@@ -65,13 +132,17 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
     setStep('processing')
 
     try {
+      const finalTotalValue = finalTotal()
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
           name,
-          totalPrice: totalPrice(),
+          totalPrice: finalTotalValue,
+          subtotal: subtotal(),
+          discount: subtotal() - finalTotalValue,
+          promoCode: promo?.code,
           items: items.map((item) => ({
             productId: item.product.id,
             name: item.product.name,
@@ -84,6 +155,24 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
 
       if (!res.ok) throw new Error(data.error || 'Failed to create order')
 
+      // Save to my orders (localStorage)
+      addOrder({
+        orderId: data.orderId,
+        email,
+        name,
+        items: items.map((item) => ({
+          productId: item.product.id,
+          name: item.product.name,
+          price: item.product.price,
+          quantity: item.quantity,
+        })),
+        subtotal: subtotal(),
+        discount: subtotal() - finalTotalValue,
+        total: finalTotalValue,
+        promoCode: promo?.code,
+        date: new Date().toISOString(),
+      })
+
       setOrderId(data.orderId)
       clearCart()
       setStep('success')
@@ -93,9 +182,12 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
     }
   }
 
+  const afterBundle = subtotal() - bundleDiscount()
+  const promoDiscount = promo?.discount ?? 0
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md bg-card border-border p-0 overflow-hidden">
+      <DialogContent className="max-w-md bg-card border-border p-0 overflow-hidden max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="p-6 pb-4 border-b border-border">
           <DialogHeader>
@@ -135,7 +227,8 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                   {items.map((item) => (
                     <div key={item.product.id} className="flex justify-between text-sm">
                       <span className="text-muted-foreground truncate flex-1 mr-2">
-                        {item.product.name} <span className="text-xs">×{item.quantity}</span>
+                        {item.product.name}{' '}
+                        <span className="text-xs">×{item.quantity}</span>
                       </span>
                       <span className="font-medium whitespace-nowrap">
                         €{(item.product.price * item.quantity).toFixed(2)}
@@ -144,22 +237,91 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                   ))}
                 </div>
                 <Separator className="bg-border" />
-                {totalSavings() > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>€{subtotal().toFixed(2)}</span>
+                </div>
+                {totalSavings(items) > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-green-500">You save</span>
+                    <span className="text-green-500">Product savings</span>
                     <span className="text-green-500 font-medium">
-                      −€{totalSavings().toFixed(2)}
+                      −€{totalSavings(items).toFixed(2)}
                     </span>
                   </div>
                 )}
-                <div className="flex justify-between font-semibold">
+                {bundleDiscount() > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-green-500 flex items-center gap-1">
+                      <Gift className="h-3 w-3" /> Bundle (30%)
+                    </span>
+                    <span className="text-green-500 font-medium">
+                      −€{bundleDiscount().toFixed(2)}
+                    </span>
+                  </div>
+                )}
+                {promo && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-green-500 flex items-center gap-1">
+                      <Tag className="h-3 w-3" /> {promo.code}
+                      <button
+                        type="button"
+                        onClick={() => setPromo(null)}
+                        className="ml-1 text-muted-foreground hover:text-destructive"
+                        aria-label="Remove promo"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                    <span className="text-green-500 font-medium">
+                      −€{promo.discount.toFixed(2)}
+                    </span>
+                  </div>
+                )}
+                <Separator className="bg-border" />
+                <div className="flex justify-between font-semibold text-lg">
                   <span>Total</span>
-                  <span className="text-primary">€{totalPrice().toFixed(2)}</span>
+                  <span className="text-primary">€{finalTotal().toFixed(2)}</span>
                 </div>
               </div>
 
+              {/* Promo code input */}
+              {!promo && (
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Promo Code</Label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        value={promoInput}
+                        onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                        placeholder="WELCOME10"
+                        className="pl-9 bg-background border-border rounded-lg h-10 uppercase tracking-wider text-sm"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="border-border hover:border-primary/40 rounded-lg h-10 px-4"
+                      onClick={handleApplyPromo}
+                      disabled={promoLoading || !promoInput.trim()}
+                    >
+                      {promoLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        'Apply'
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Try <span className="text-primary font-medium">WELCOME10</span>,{' '}
+                    <span className="text-primary font-medium">SAVE5</span>, or{' '}
+                    <span className="text-primary font-medium">FIVEM20</span> (min €50)
+                  </p>
+                </div>
+              )}
+
               {/* Customer info */}
-              <div className="space-y-3">
+              <div className="space-y-3 pt-2">
                 <div className="space-y-1.5">
                   <Label htmlFor="checkout-name" className="text-xs">
                     Full Name
@@ -221,7 +383,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                 type="submit"
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-11 font-semibold"
               >
-                Complete Purchase — €{totalPrice().toFixed(2)}
+                Complete Purchase — €{finalTotal().toFixed(2)}
               </Button>
               <p className="text-[11px] text-muted-foreground text-center">
                 This is a demo checkout — no real payment will be processed.
@@ -251,7 +413,8 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
               <div className="space-y-1">
                 <p className="font-semibold text-lg">Thank you, {name.split(' ')[0]}!</p>
                 <p className="text-sm text-muted-foreground">
-                  Your scripts are on their way to <span className="text-foreground">{email}</span>
+                  Your scripts are on their way to{' '}
+                  <span className="text-foreground">{email}</span>
                 </p>
               </div>
 
@@ -264,6 +427,10 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Status</span>
                   <span className="text-green-500 font-medium">Completed</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">View in</span>
+                  <span className="text-primary">My Orders</span>
                 </div>
               </div>
 
@@ -279,4 +446,12 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
       </DialogContent>
     </Dialog>
   )
+}
+
+// Helper function to compute totalSavings outside store context
+function totalSavings(items: { product: { originalPrice?: number; price: number }; quantity: number }[]) {
+  return items.reduce((sum, item) => {
+    const orig = item.product.originalPrice ?? item.product.price
+    return sum + (orig - item.product.price) * item.quantity
+  }, 0)
 }

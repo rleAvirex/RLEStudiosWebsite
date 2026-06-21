@@ -124,3 +124,91 @@ Unresolved / Next Steps:
 - Could add currency switcher (currently only EUR)
 - Could add "trending now" or "new arrivals" filter tabs
 - Note: dev server had stale PrismaClient issue after DB reset — required manual restart. Future cron rounds should be aware of this if schema changes again.
+
+---
+Task ID: 3
+Agent: Cron Review Agent (Round 2)
+Task: QA test the site, then add more features and improve styling per user request
+
+Work Log:
+- Reviewed worklog.md — site was stable from Task ID 2 with 10+ sections, 4 API routes, wishlist/recently-viewed/checkout/newsletter features
+- Ran ESLint check — passes clean
+- QA tested with agent-browser: confirmed all existing features (hero, featured, scripts, cart, checkout, wishlist, FAQ, newsletter) functional
+- Selected work focus: Add promo codes, bundle deals, product comparison, my orders history, navbar search, hero animations, back-to-top
+
+Backend additions:
+- Added PromoCode model to Prisma schema (code, description, discountType, discountValue, minOrder, maxUses, usesCount, isActive, expiresAt)
+- Added subtotal, discount, promoCode fields to Order model
+- Pushed schema, regenerated Prisma client, restarted dev server to pick up new client
+- Created /api/promo-codes POST (seed) + GET (list active codes)
+- Created /api/promo-codes/validate POST (validates code against subtotal, returns discount)
+- Seeded 4 promo codes: WELCOME10 (10% off), FIVEM20 (20% off €50+), SAVE5 (€5 off), BUNDLE30 (30% off)
+- Updated /api/orders POST to accept subtotal, discount, promoCode and increment promo code usage count
+
+Store enhancements (src/lib/store.ts):
+- Replaced totalPrice() with subtotal() in cart store
+- Added bundleDiscount() — auto-applies 30% off featured items when 3+ in cart
+- Added hasBundleDeal() — boolean check
+- Added promo: AppliedPromo | null + setPromo() + finalTotal() (subtotal - bundle - promo)
+- Added useCompareStore (persist) — toggle/remove/clear, max 3 items
+- Added useMyOrdersStore (persist) — addOrder/clear, stores last 50 orders
+
+New components:
+- NavbarSearch (src/components/navbar-search.tsx) — search input in navbar with live dropdown suggestions (max 5), thumbnail + name + category + price + "Hot" badge for popular items, click opens product detail
+- BackToTop (src/components/back-to-top.tsx) — floating orange button appears after 500px scroll, smooth scroll to top
+- CompareSheet (src/components/compare-sheet.tsx) — side-by-side comparison up to 3 products, shows image/name/price, 8 comparison rows (Price, Category, Framework, Version, Rating, Sales, Last Updated, Featured), top 5 features list per product, add-to-cart per product
+- MyOrdersSheet (src/components/my-orders-sheet.tsx) — order history from localStorage, shows date, order ID, items, subtotal/discount/total breakdown, promo code used, download button per order
+
+Enhanced existing components:
+- Hero: added Framer Motion entrance animations (staggered children for text, floating cards animate in sequence, pulsing background glow, animated scroll indicator)
+- Navbar: added search box (desktop center, mobile below), Compare icon with badge, My Orders icon, mobile menu now shows Compare + My Orders buttons
+- ProductCard: added Compare button next to wishlist heart, ring highlight when in compare
+- ProductDetailDialog: added Compare button in action row alongside wishlist
+- CartSheet: shows bundle deal indicator (green "applied" or orange "add N more to unlock"), displays bundle discount line, promo code preview with remove button, updated totals to use finalTotal()
+- CheckoutDialog: added promo code input with Apply button, validates via /api/promo-codes/validate, shows discount breakdown (subtotal, product savings, bundle, promo, total), saves order to MyOrdersStore on success, success state mentions "View in My Orders"
+
+Page.tsx updates:
+- Wires all new components (NavbarSearch, BackToTop, CompareSheet, MyOrdersSheet)
+- Passes products + onProductClick to Navbar for search
+- Initializes promo-codes seed on mount
+- Manages compareOpen + ordersOpen state
+
+Bug fixes during development:
+- Fixed ESLint error in navbar-search.tsx: replaced setState-in-effect pattern with useMemo for computing suggestions
+- Resolved stale Prisma client after schema change: regenerated client + restarted dev server (note: this is a recurring issue documented in Task ID 2 worklog)
+
+QA verification via agent-browser:
+- Navbar shows: logo, search box, Scripts/Featured/FAQ links, Compare (badge), My Orders, Wishlist (badge), Cart (badge)
+- Navbar search: typing "police" shows 2 suggestions (Drug Processing + Police MDT), clicking opens detail dialog
+- Product detail dialog: shows Compare + Wishlist buttons in action row
+- Compare: clicking compare adds to list (badge increments), opening Compare sheet shows product with 8 comparison rows + features
+- Cart with 4 featured items: bundle deal auto-applied, shows "30% off 4 featured scripts (−€34.49)", total €80.47 (from €114.96 subtotal)
+- Checkout with promo: applied WELCOME10, total dropped from €80.47 to €72.42 (10% off post-bundle), promo code shown in summary with remove button
+- Order completion: success state shows, order saved to DB with subtotal €114.96, discount €42.54, promoCode WELCOME10, total €72.42
+- My Orders: shows 1 order with full breakdown (4 items, subtotal €114.96, discount €42.54 with WELCOME10, total €72.42), download button present
+- DB verification: 2 orders in DB, WELCOME10 promo usesCount incremented to 1
+- Mobile (375x812): navbar shows logo + wishlist + cart + menu, search box below navbar, mobile menu shows Compare (badge) + My Orders buttons
+- Back-to-top button appears after scrolling
+
+Stage Summary:
+- Site now has 5 major new features: promo codes, bundle deals (auto-applied), product comparison (up to 3), my orders history, navbar live search
+- Visual polish: Framer Motion hero animations, back-to-top button, compare ring highlight on cards, bundle deal indicators in cart
+- Backend expanded: 6 API routes total (products, seed, orders, newsletter, promo-codes, promo-codes/validate)
+- Database schema expanded: PromoCode model + Order.subtotal/discount/promoCode fields
+- All ESLint checks pass
+- All QA tests passed: search, compare, cart+bundle, checkout+promo, my orders, mobile
+
+Unresolved / Next Steps:
+- Could add user accounts/authentication (NextAuth.js available) to sync orders across devices
+- Could add product reviews/comments system
+- Could add admin panel for managing products + promo codes
+- Could add download center (actual file delivery, currently just a button)
+- Could add product screenshots gallery in detail dialog
+- Could add currency switcher (currently only EUR)
+- Could add live chat / Discord widget
+- Could add "trending now" or "new arrivals" filter tabs
+- Could add email notifications for newsletter subscribers (currently just saved to DB)
+- Note: dev server requires manual restart when Prisma schema changes (recurring issue, documented in Task ID 2)
+- Could add quantity-based bundle deals (e.g., buy 2 of same script get 10% off)
+- Could add wishlist sharing (generate shareable URL)
+- Could add recently searched terms persistence

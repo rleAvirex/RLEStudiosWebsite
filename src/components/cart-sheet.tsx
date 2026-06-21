@@ -1,6 +1,17 @@
 'use client'
 
-import { Minus, Plus, Trash2, ShoppingBag, ShieldCheck, Download, RefreshCw } from 'lucide-react'
+import {
+  Minus,
+  Plus,
+  Trash2,
+  ShoppingBag,
+  ShieldCheck,
+  Download,
+  RefreshCw,
+  Tag,
+  Gift,
+  X,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -18,13 +29,28 @@ interface CartSheetProps {
 }
 
 export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
-  const { items, removeItem, updateQuantity, totalPrice, totalSavings, clearCart } = useCartStore()
+  const {
+    items,
+    removeItem,
+    updateQuantity,
+    subtotal,
+    totalSavings,
+    bundleDiscount,
+    hasBundleDeal,
+    promo,
+    setPromo,
+    finalTotal,
+    clearCart,
+  } = useCartStore()
 
   const handleCheckout = () => {
     if (items.length === 0) return
     onOpenChange(false)
     onCheckout()
   }
+
+  const featuredCount = items.filter((i) => i.product.isFeatured).length
+  const featuredNeeded = Math.max(0, 3 - featuredCount)
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -93,9 +119,7 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
                         variant="outline"
                         size="icon"
                         className="h-7 w-7 rounded-md border-border"
-                        onClick={() =>
-                          updateQuantity(item.product.id, item.quantity - 1)
-                        }
+                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                       >
                         <Minus className="h-3 w-3" />
                       </Button>
@@ -106,9 +130,7 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
                         variant="outline"
                         size="icon"
                         className="h-7 w-7 rounded-md border-border"
-                        onClick={() =>
-                          updateQuantity(item.product.id, item.quantity + 1)
-                        }
+                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
@@ -124,6 +146,27 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Bundle deal indicator */}
+            <div className="pt-2">
+              {hasBundleDeal ? (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500 text-xs">
+                  <Gift className="h-3.5 w-3.5 shrink-0" />
+                  <span>
+                    Bundle deal applied! 30% off {featuredCount} featured scripts
+                    (−€{bundleDiscount().toFixed(2)})
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/20 text-primary text-xs">
+                  <Gift className="h-3.5 w-3.5 shrink-0" />
+                  <span>
+                    Add {featuredNeeded} more featured script{featuredNeeded > 1 ? 's' : ''} to
+                    unlock 30% bundle discount!
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="space-y-3 pt-4">
@@ -145,17 +188,48 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
 
               <Separator className="bg-border" />
               <div className="space-y-1.5">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>€{subtotal().toFixed(2)}</span>
+                </div>
                 {totalSavings() > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-green-500">You save</span>
+                    <span className="text-green-500">Product savings</span>
                     <span className="text-green-500 font-medium">
                       −€{totalSavings().toFixed(2)}
                     </span>
                   </div>
                 )}
-                <div className="flex justify-between font-semibold text-lg">
+                {bundleDiscount() > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-green-500 flex items-center gap-1">
+                      <Gift className="h-3 w-3" /> Bundle deal (30%)
+                    </span>
+                    <span className="text-green-500 font-medium">
+                      −€{bundleDiscount().toFixed(2)}
+                    </span>
+                  </div>
+                )}
+                {promo && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-green-500 flex items-center gap-1">
+                      <Tag className="h-3 w-3" /> Promo {promo.code}
+                      <button
+                        onClick={() => setPromo(null)}
+                        className="ml-1 text-muted-foreground hover:text-destructive"
+                        aria-label="Remove promo"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                    <span className="text-green-500 font-medium">
+                      −€{promo.discount.toFixed(2)}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between font-semibold text-lg pt-1">
                   <span>Total</span>
-                  <span className="text-primary">€{totalPrice().toFixed(2)}</span>
+                  <span className="text-primary">€{finalTotal().toFixed(2)}</span>
                 </div>
               </div>
 
@@ -164,7 +238,7 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
                 onClick={handleCheckout}
               >
-                Checkout — €{totalPrice().toFixed(2)}
+                Checkout — €{finalTotal().toFixed(2)}
               </Button>
               <Button
                 variant="ghost"
