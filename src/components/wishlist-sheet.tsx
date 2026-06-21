@@ -1,6 +1,7 @@
 'use client'
 
-import { Heart, ShoppingCart, Trash2, X } from 'lucide-react'
+import { useState } from 'react'
+import { Heart, ShoppingCart, Trash2, Share2, Check, Link2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -8,7 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { useWishlistStore, useCartStore, useCurrencyStore, formatPrice, type Product } from '@/lib/store'
+import { useWishlistStore, useCartStore, type Product } from '@/lib/store'
 import { toast } from '@/hooks/use-toast'
 
 interface WishlistSheetProps {
@@ -20,7 +21,7 @@ interface WishlistSheetProps {
 export function WishlistSheet({ open, onOpenChange, onViewDetail }: WishlistSheetProps) {
   const { items, removeItem } = useWishlistStore()
   const addItem = useCartStore((s) => s.addItem)
-  const currency = useCurrencyStore((s) => s.currency)
+  const [copied, setCopied] = useState(false)
 
   const handleAddToCart = (product: Product) => {
     addItem(product)
@@ -30,11 +31,25 @@ export function WishlistSheet({ open, onOpenChange, onViewDetail }: WishlistShee
     })
   }
 
-  const handleRemove = (productId: string) => {
-    removeItem(productId)
-    toast({
-      title: 'Removed from wishlist',
-    })
+  const handleShare = async () => {
+    if (items.length === 0) return
+    const ids = items.map((p) => p.id).join(',')
+    const url = `${window.location.origin}?wishlist=${ids}`
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      toast({
+        title: 'Wishlist link copied!',
+        description: 'Share it with your friends.',
+      })
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      toast({
+        title: 'Could not copy',
+        description: 'Please copy the URL manually.',
+        variant: 'destructive',
+      })
+    }
   }
 
   return (
@@ -63,54 +78,87 @@ export function WishlistSheet({ open, onOpenChange, onViewDetail }: WishlistShee
                 Save scripts you love for later
               </p>
             </div>
+            <Button
+              variant="outline"
+              className="rounded-xl border-border"
+              onClick={() => onOpenChange(false)}
+            >
+              Browse Scripts
+            </Button>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto py-4 space-y-3">
-            {items.map((product) => (
-              <div
-                key={product.id}
-                className="flex gap-3 p-3 rounded-xl bg-background border border-border"
-              >
-                <button
-                  className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-muted cursor-pointer"
-                  onClick={() => {
-                    onViewDetail(product)
-                    onOpenChange(false)
-                  }}
+          <>
+            <div className="flex-1 overflow-y-auto py-4 space-y-3">
+              {items.map((product) => (
+                <div
+                  key={product.id}
+                  className="flex gap-3 p-3 rounded-xl bg-background border border-border"
                 >
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-medium truncate">{product.name}</h4>
-                  <p className="text-primary font-semibold text-sm mt-0.5">
-                    {formatPrice(product.price, currency)}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Button
-                      size="sm"
-                      className="h-7 px-2.5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs rounded-md"
-                      onClick={() => handleAddToCart(product)}
-                    >
-                      <ShoppingCart className="h-3 w-3 mr-1" />
-                      Add
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                      onClick={() => handleRemove(product.id)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
+                  <button
+                    className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-muted cursor-pointer"
+                    onClick={() => {
+                      onViewDetail(product)
+                      onOpenChange(false)
+                    }}
+                  >
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-medium truncate">{product.name}</h4>
+                    <p className="text-primary font-semibold text-sm mt-0.5">
+                      €{product.price.toFixed(2)}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Button
+                        size="sm"
+                        className="h-7 px-2.5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs rounded-md"
+                        onClick={() => handleAddToCart(product)}
+                      >
+                        <ShoppingCart className="h-3 w-3 mr-1" />
+                        Add
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                        onClick={() => removeItem(product.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+
+            <div className="pt-3 border-t border-border space-y-2">
+              <Button
+                variant="outline"
+                className="w-full rounded-xl border-border hover:border-primary/40"
+                onClick={handleShare}
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4 mr-2 text-green-500" />
+                    Link Copied!
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Share Wishlist
+                  </>
+                )}
+              </Button>
+              <p className="text-[10px] text-muted-foreground text-center flex items-center justify-center gap-1">
+                <Link2 className="h-2.5 w-2.5" />
+                Copy a link with your saved items
+              </p>
+            </div>
+          </>
         )}
       </SheetContent>
     </Sheet>

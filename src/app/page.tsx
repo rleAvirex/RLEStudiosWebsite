@@ -15,6 +15,7 @@ import { BackToTop } from '@/components/back-to-top'
 import { DiscordWidget } from '@/components/discord-widget'
 import { AnnouncementBar } from '@/components/announcement-bar'
 import { CookieConsent } from '@/components/cookie-consent'
+import { SocialProofNotifications } from '@/components/social-proof-notifications'
 import { SkeletonGrid } from '@/components/skeleton-card'
 import { Features } from '@/components/sections/features'
 import { Testimonials } from '@/components/sections/testimonials'
@@ -387,6 +388,7 @@ export default function Home() {
       <BackToTop />
       <DiscordWidget />
       <CookieConsent />
+      <SocialProofNotifications />
 
       {/* Overlays */}
       <CartSheet

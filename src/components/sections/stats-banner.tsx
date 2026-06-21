@@ -1,27 +1,28 @@
 'use client'
 
 import { ShoppingBag, TrendingUp, Star, Clock } from 'lucide-react'
+import { AnimatedCounter } from '@/components/animated-counter'
 
 const STATS = [
   {
     icon: ShoppingBag,
     label: 'Scripts Sold',
-    value: '12,400+',
+    render: () => <AnimatedCounter value={12400} suffix="+" />,
   },
   {
     icon: TrendingUp,
     label: 'Active Servers',
-    value: '2,800+',
+    render: () => <AnimatedCounter value={2800} suffix="+" />,
   },
   {
     icon: Star,
     label: 'Average Rating',
-    value: '4.9 / 5',
+    render: () => <AnimatedCounter value={49} duration={1500} renderValue={(v) => `${(v / 10).toFixed(1)} / 5`} />,
   },
   {
     icon: Clock,
     label: 'Support Response',
-    value: '< 30 min',
+    render: () => <><span className="text-lg">&lt;</span> 30 min</>,
   },
 ]
 
@@ -38,7 +39,7 @@ export function StatsBanner() {
                   <Icon className="h-5 w-5 text-primary" />
                 </div>
                 <div className="text-2xl sm:text-3xl font-bold text-foreground">
-                  {stat.value}
+                  {stat.render()}
                 </div>
                 <div className="text-xs sm:text-sm text-muted-foreground">{stat.label}</div>
               </div>

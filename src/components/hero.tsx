@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { ArrowDown, Zap, Star, ShieldCheck, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { AnimatedCounter } from '@/components/animated-counter'
 
 const container = {
   hidden: { opacity: 0 },
@@ -238,11 +239,15 @@ export function Hero() {
           className="mt-12 lg:mt-16 grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto lg:mx-0"
         >
           <div className="text-center lg:text-left">
-            <div className="text-2xl sm:text-3xl font-bold text-primary">50+</div>
+            <div className="text-2xl sm:text-3xl font-bold text-primary">
+              <AnimatedCounter value={50} suffix="+" />
+            </div>
             <div className="text-xs sm:text-sm text-muted-foreground mt-1">Scripts</div>
           </div>
           <div className="text-center lg:text-left border-y lg:border-y-0 lg:border-x border-border py-2 lg:py-0 lg:px-4">
-            <div className="text-2xl sm:text-3xl font-bold text-primary">2K+</div>
+            <div className="text-2xl sm:text-3xl font-bold text-primary">
+              <AnimatedCounter value={2000} suffix="+" />
+            </div>
             <div className="text-xs sm:text-sm text-muted-foreground mt-1">Customers</div>
           </div>
           <div className="text-center lg:text-left">
