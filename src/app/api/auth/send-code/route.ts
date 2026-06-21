@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { sendMagicCodeEmail, isEmailConfigured } from '@/lib/email'
 
 function generateCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString()
@@ -29,15 +30,30 @@ export async function POST(request: Request) {
       },
     })
 
-    // In dev mode, return the code so it can be displayed on screen
-    // In production, you'd send this via email (Resend, Postmark, etc.)
-    const isDev = process.env.NODE_ENV !== 'production'
+    const emailConfigured = isEmailConfigured()
+
+    if (emailConfigured) {
+      const sent = await sendMagicCodeEmail({ to: normalizedEmail, code })
+      if (!sent) {
+        return NextResponse.json(
+          { error: 'Failed to send login code. Please try again.' },
+          { status: 500 }
+        )
+      }
+    }
+
+    // Show the code on screen only when email is NOT actually being delivered:
+    //   - dev mode (NODE_ENV !== 'production'), or
+    //   - no API key configured (so local dev / unconfigured deploys still work)
+    const showCodeOnScreen =
+      process.env.NODE_ENV !== 'production' || !emailConfigured
 
     return NextResponse.json({
       success: true,
-      message: 'Code sent. Check your email.',
-      // Only include code in dev mode
-      ...(isDev && { code }),
+      message: emailConfigured
+        ? 'Code sent. Check your email.'
+        : 'Email not configured — see code below (dev only).',
+      ...(showCodeOnScreen && { code }),
     })
   } catch (error) {
     console.error('Error sending code:', error)
