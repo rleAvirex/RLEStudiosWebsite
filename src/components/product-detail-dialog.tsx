@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import {
   ShoppingCart,
   Code,
@@ -14,6 +15,7 @@ import {
   RefreshCw,
   GitCompare,
   MessageSquare,
+  Tag,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -43,6 +45,15 @@ interface ProductDetailDialogProps {
   onCartOpen?: () => void
 }
 
+// Build gallery images from a single product image
+// (In production, each product would have multiple images; here we simulate with variations)
+function getGalleryImages(image: string): string[] {
+  const baseImage = image
+  // We only have one image per product, so return it 3 times for the gallery UI
+  // In a real app this would be [image, image2, image3]
+  return [baseImage, baseImage, baseImage]
+}
+
 export function ProductDetailDialog({
   product,
   open,
@@ -50,6 +61,7 @@ export function ProductDetailDialog({
   reviewCounts = {},
   onCartOpen,
 }: ProductDetailDialogProps) {
+  const [activeImage, setActiveImage] = useState(0)
   const addItem = useCartStore((s) => s.addItem)
   const toggleWishlist = useWishlistStore((s) => s.toggleItem)
   const isInWishlist = useWishlistStore((s) => (product ? s.ids.includes(product.id) : false))
@@ -59,6 +71,8 @@ export function ProductDetailDialog({
   const currency = useCurrencyStore((s) => s.currency)
 
   if (!product) return null
+
+  const galleryImages = getGalleryImages(product.image)
 
   const handleAddToCart = () => {
     addItem(product)
@@ -105,27 +119,56 @@ export function ProductDetailDialog({
   const reviewCount = reviewCounts[product.id] ?? 0
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        onOpenChange(v)
+        if (!v) setActiveImage(0)
+      }}
+    >
       <DialogContent className="max-w-3xl bg-card border-border p-0 overflow-hidden max-h-[90vh] overflow-y-auto">
-        {/* Product Image */}
-        <div className="relative aspect-video w-full overflow-hidden">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
-          {product.isFeatured && (
-            <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
-              <Star className="h-3 w-3 mr-1" />
-              Featured
-            </Badge>
-          )}
-          {hasDiscount && (
-            <Badge className="absolute top-4 right-4 bg-red-500/90 text-white">
-              -{discountPercent}% OFF
-            </Badge>
-          )}
+        {/* Image gallery */}
+        <div className="flex flex-col sm:flex-row gap-3 p-4 bg-background/50">
+          {/* Thumbnails - left on desktop, bottom on mobile */}
+          <div className="flex sm:flex-col gap-2 order-2 sm:order-1">
+            {galleryImages.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveImage(i)}
+                className={`w-16 h-16 sm:w-20 sm:h-14 rounded-lg overflow-hidden border-2 transition-all shrink-0 ${
+                  activeImage === i
+                    ? 'border-primary scale-105'
+                    : 'border-border opacity-60 hover:opacity-100'
+                }`}
+              >
+                <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+          {/* Main image */}
+          <div className="relative aspect-video flex-1 rounded-xl overflow-hidden bg-muted order-1 sm:order-2">
+            <img
+              src={galleryImages[activeImage]}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-card/50 to-transparent" />
+            {product.isFeatured && (
+              <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
+                <Star className="h-3 w-3 mr-1" />
+                Featured
+              </Badge>
+            )}
+            {hasDiscount && (
+              <Badge className="absolute top-4 right-4 bg-red-500/90 text-white">
+                -{discountPercent}% OFF
+              </Badge>
+            )}
+            {/* Image counter */}
+            <div className="absolute bottom-3 right-3 px-2 py-0.5 rounded-md bg-card/80 backdrop-blur-sm text-[10px] text-muted-foreground">
+              {activeImage + 1} / {galleryImages.length}
+            </div>
+          </div>
         </div>
 
         <div className="p-6 space-y-5">
@@ -174,6 +217,24 @@ export function ProductDetailDialog({
               </div>
             </div>
           </DialogHeader>
+
+          {/* Tags */}
+          {product.tags && product.tags.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+                <Tag className="h-3 w-3" />
+                Tags:
+              </span>
+              {product.tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="px-2 py-0.5 rounded-md bg-muted text-[11px] text-muted-foreground"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Meta chips */}
           <div className="flex items-center gap-2 flex-wrap">

@@ -19,6 +19,7 @@ model Product {
   category      String
   image         String
   features      String   // JSON string of features array
+  tags          String   @default("[]") // JSON string of tags array
   isFeatured    Boolean  @default(false)
   version       String   @default("1.0.0")
   framework     String   @default("ESX / QBCore")

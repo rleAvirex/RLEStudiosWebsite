@@ -301,3 +301,74 @@ Unresolved / Next Steps:
 - Could add review helpfulness voting (currently just a display)
 - Could add currency conversion fee notice
 - Note: dev server requires manual restart when Prisma schema changes (recurring issue since Task ID 2)
+
+---
+Task ID: 5
+Agent: Cron Review Agent (Round 4)
+Task: QA test the site, then add more features and improve styling per user request
+
+Work Log:
+- Reviewed worklog.md — site was stable from Task ID 4 with reviews, currency switcher, Discord widget, quick filters, skeleton loaders, toast actions
+- Ran ESLint check — passes clean
+- QA tested with agent-browser: confirmed all existing features functional
+- Selected work focus: Product tags, image gallery, bundle deals section, announcement bar, cookie consent, helpfulness voting, enhanced search
+
+Backend additions:
+- Added tags field (String, JSON array) to Product model in Prisma schema
+- Pushed schema, regenerated Prisma client, reset DB for fresh seed with tags
+- Updated /api/products GET to parse and return tags array
+- Created /api/reviews/helpful POST endpoint — increments helpful count on a review
+- Updated seed route to include 4 tags per product (e.g., garage→['garage','vehicle','impound','parking'])
+- Used Python script to programmatically add tags to all 9 sample products in seed file
+
+Store enhancements (src/lib/store.ts):
+- Added tags: string[] to Product interface
+
+New components:
+- AnnouncementBar (src/components/announcement-bar.tsx) — top promo banner with auto-rotating messages (3 messages, 5s interval), dismissible, orange background
+- CookieConsent (src/components/cookie-consent.tsx) — GDPR cookie notice appears after 1.5s delay, Accept/Decline buttons, persisted to localStorage, bottom-left floating card
+- BundleDeals (src/components/sections/bundle-deals.tsx) — dedicated bundles showcase section with 3 pre-built bundles (Starter Pack 25% off, Roleplay Bundle 30% off highlighted, Economy Pro 35% off), shows product list, regular price, discount, savings, and "You pay" total per bundle
+
+Enhanced existing components:
+- ProductDetailDialog: added image gallery (3 thumbnails + main image with switcher, image counter "1/3"), tags display (#tag chips), gallery resets on dialog close
+- ProductCard: added tags display (up to 3 tag chips with "+N" overflow), Tag icon on each chip
+- ReviewsSection: helpfulness voting now functional — clicking "Helpful" button does optimistic update + POST to /api/reviews/helpful, reverts on error, ThumbsUp icon scales on hover
+- page.tsx: integrated AnnouncementBar (top), BundleDeals section (between Features and All Scripts), CookieConsent (floating), search now matches tags in addition to name/description, updated search placeholder to "Search by name, description, or tags..."
+- Hero: updated top padding from pt-16 to pt-24 to account for announcement bar
+
+QA verification via agent-browser:
+- Announcement bar: visible at top with rotating messages ("Buy 3+ featured scripts and get an automatic 30% bundle discount"), dismiss button works
+- Bundle Deals section: 3 bundles visible (Starter Pack, Roleplay Bundle, Economy Pro), pricing correct (Starter Pack: €77.97 regular, −€19.49 discount, €58.48 you pay = 25% off)
+- Product detail dialog: image gallery shows 3 thumbnails + main image, image counter "1/3" visible, clicking thumbnails switches main image
+- Tags: visible in product detail dialog (#hud, #ui, #interface, #minimal for HUD product) and on product cards (3 tag chips max)
+- Helpfulness voting: clicked "Helpful" button, count incremented 0→1, verified in DB (1 review with helpful=1)
+- Search by tags: searching "police" returns 2 results, searching "hud" returns 1 result — tags are now searchable
+- Cookie consent: appears after 1.5s with "We use cookies" heading, Accept/Decline buttons
+- Currency switcher, quick filters, reviews, all previously working features still functional
+
+Stage Summary:
+- Site now has 7 major new features: product tags (with search), image gallery in detail dialog, bundle deals section, announcement bar (rotating messages), cookie consent (GDPR), helpfulness voting on reviews, enhanced search (name + description + tags)
+- Visual polish: announcement bar with rotating messages, bundle deal cards with highlighted middle option, image gallery thumbnails, tag chips on cards and detail dialog
+- Backend expanded: 9 API routes total (products, seed, orders, newsletter, promo-codes, promo-codes/validate, reviews, reviews/seed, reviews/helpful)
+- Database schema: tags field added to Product
+- 4 tags per product seeded (36 total tags across 9 products)
+- 3 curated bundle deals with 25-35% discounts
+- All ESLint checks pass
+- All QA tests passed: announcement bar, bundles, gallery, tags, helpfulness voting, tag search, cookie consent
+
+Unresolved / Next Steps:
+- Could add user accounts/authentication (NextAuth.js available) to tie reviews/orders to accounts
+- Could add admin panel for managing products, promo codes, bundles, and moderating reviews
+- Could add actual file delivery / download center for purchased scripts
+- Could add multiple real images per product (currently simulates with same image 3×)
+- Could add live chat integration (currently just Discord CTA)
+- Could add email notifications for newsletter subscribers
+- Could add quantity-based bundle deals (e.g., buy 2 of same script get 10% off)
+- Could add wishlist sharing (generate shareable URL)
+- Could add recently searched terms persistence in NavbarSearch
+- Could add "verified purchase" badge on reviews (requires order history linkage)
+- Could add product comparison matrix view (table format)
+- Could add currency conversion fee notice
+- Could add dark/light theme toggle (currently dark-only)
+- Could add product rating notification when review is submitted
+- Note: dev server requires manual restart when Prisma schema changes (recurring issue since Task ID 2)

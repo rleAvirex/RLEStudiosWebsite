@@ -10,6 +10,7 @@ export interface Product {
   category: string
   image: string
   features: string[]
+  tags: string[]
   isFeatured: boolean
   version: string
   framework: string

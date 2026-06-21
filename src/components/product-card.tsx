@@ -9,6 +9,7 @@ import {
   TrendingUp,
   GitCompare,
   MessageSquare,
+  Tag,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -227,6 +228,24 @@ export function ProductCard({ product, onViewDetail, featured, reviewCount = 0, 
             v{product.version}
           </span>
         </div>
+
+        {/* Tags */}
+        {product.tags && product.tags.length > 0 && (
+          <div className="flex items-center gap-1 flex-wrap">
+            {product.tags.slice(0, 3).map((tag, i) => (
+              <span
+                key={i}
+                className="px-1.5 py-0.5 rounded bg-muted text-[10px] text-muted-foreground flex items-center gap-0.5"
+              >
+                <Tag className="h-2 w-2" />
+                {tag}
+              </span>
+            ))}
+            {product.tags.length > 3 && (
+              <span className="text-[10px] text-muted-foreground">+{product.tags.length - 3}</span>
+            )}
+          </div>
+        )}
 
         {/* Add to Cart */}
         <Button

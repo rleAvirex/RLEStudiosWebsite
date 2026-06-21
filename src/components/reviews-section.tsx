@@ -305,8 +305,33 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
               <p className="text-sm font-medium">{review.title}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">{review.comment}</p>
               <div className="flex items-center gap-1 pt-1">
-                <button className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-primary transition-colors">
-                  <ThumbsUp className="h-3 w-3" />
+                <button
+                  onClick={async (e) => {
+                    e.preventDefault()
+                    // Optimistic update
+                    setReviews((prev) =>
+                      prev.map((r) =>
+                        r.id === review.id ? { ...r, helpful: r.helpful + 1 } : r
+                      )
+                    )
+                    try {
+                      await fetch('/api/reviews/helpful', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ reviewId: review.id }),
+                      })
+                    } catch {
+                      // Revert on error
+                      setReviews((prev) =>
+                        prev.map((r) =>
+                          r.id === review.id ? { ...r, helpful: r.helpful - 1 } : r
+                        )
+                      )
+                    }
+                  }}
+                  className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-primary transition-colors group"
+                >
+                  <ThumbsUp className="h-3 w-3 group-hover:scale-110 transition-transform" />
                   Helpful ({review.helpful})
                 </button>
               </div>

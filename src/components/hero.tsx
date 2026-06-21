@@ -34,7 +34,7 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24"
     >
       {/* Background gradient effects */}
       <div className="absolute inset-0 bg-background" />

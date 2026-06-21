@@ -13,6 +13,8 @@ import { MyOrdersSheet } from '@/components/my-orders-sheet'
 import { Footer } from '@/components/footer'
 import { BackToTop } from '@/components/back-to-top'
 import { DiscordWidget } from '@/components/discord-widget'
+import { AnnouncementBar } from '@/components/announcement-bar'
+import { CookieConsent } from '@/components/cookie-consent'
 import { SkeletonGrid } from '@/components/skeleton-card'
 import { Features } from '@/components/sections/features'
 import { Testimonials } from '@/components/sections/testimonials'
@@ -21,6 +23,7 @@ import { Newsletter } from '@/components/sections/newsletter'
 import { CTABanner } from '@/components/sections/cta-banner'
 import { StatsBanner } from '@/components/sections/stats-banner'
 import { RecentlyViewed } from '@/components/sections/recently-viewed'
+import { BundleDeals } from '@/components/sections/bundle-deals'
 import { type Product, type Review, useRecentlyViewedStore } from '@/lib/store'
 import { Input } from '@/components/ui/input'
 import {
@@ -136,7 +139,8 @@ export default function Home() {
     .filter((p) => {
       const matchesSearch =
         p.name.toLowerCase().includes(search.toLowerCase()) ||
-        p.description.toLowerCase().includes(search.toLowerCase())
+        p.description.toLowerCase().includes(search.toLowerCase()) ||
+        (p.tags && p.tags.some((t) => t.toLowerCase().includes(search.toLowerCase())))
       const matchesCategory = category === 'All' || p.category === category
       const matchesQuick =
         quickFilter === 'all' ||
@@ -172,6 +176,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <AnnouncementBar />
       <Navbar
         onCartOpen={() => setCartOpen(true)}
         onWishlistOpen={() => setWishlistOpen(true)}
@@ -230,6 +235,9 @@ export default function Home() {
 
         {/* Features / Why Choose Us */}
         <Features />
+
+        {/* Bundle Deals */}
+        <BundleDeals products={products} onBrowse={scrollToScripts} />
 
         {/* All Scripts Section */}
         <section id="scripts" className="py-16 sm:py-20">
@@ -291,7 +299,7 @@ export default function Home() {
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search scripts..."
+                  placeholder="Search by name, description, or tags..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-9 bg-card border-border rounded-xl h-10"
@@ -378,6 +386,7 @@ export default function Home() {
       {/* Floating elements */}
       <BackToTop />
       <DiscordWidget />
+      <CookieConsent />
 
       {/* Overlays */}
       <CartSheet
