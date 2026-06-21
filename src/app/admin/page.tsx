@@ -8,7 +8,10 @@ import {
   Star,
   ArrowUpRight,
   ArrowDownRight,
+  LogOut,
+  Lock,
 } from 'lucide-react'
+import LogoutButton from './logout-button'
 
 async function getStats() {
   try {
@@ -168,8 +171,12 @@ export default async function AdminPage() {
               RLE Studios — Store overview and analytics
             </p>
           </div>
-          <div className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold">
-            Live Data
+          <div className="flex items-center gap-3">
+            <div className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold flex items-center gap-1.5">
+              <Lock className="h-3 w-3" />
+              Admin
+            </div>
+            <LogoutButton />
           </div>
         </div>
 

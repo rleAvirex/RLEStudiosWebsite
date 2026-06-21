@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { NavbarSearch } from '@/components/navbar-search'
 import { CurrencySwitcher } from '@/components/currency-switcher'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { AuthButton } from '@/components/auth-button'
 import {
   useCartStore,
   useWishlistStore,
@@ -67,13 +68,15 @@ export function Navbar({
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-2">
+        <div className="flex items-center justify-between h-20 gap-3">
           {/* Logo */}
-          <button onClick={() => scrollTo('hero')} className="flex items-center gap-2 group shrink-0">
-            <div className="w-8 h-8 accent-gradient rounded-lg flex items-center justify-center font-bold text-white text-sm group-hover:scale-110 transition-transform">
-              R
-            </div>
-            <span className="text-lg font-bold tracking-tight hidden sm:inline">
+          <button onClick={() => scrollTo('hero')} className="flex items-center gap-3 group shrink-0">
+            <img
+              src="/Logo.png"
+              alt="RLE Studios"
+              className="h-12 w-12 rounded-lg object-cover group-hover:scale-110 transition-transform"
+            />
+            <span className="text-2xl font-bold tracking-tight hidden sm:inline">
               RLE <span className="accent-gradient-text">Studios</span>
             </span>
           </button>
@@ -88,7 +91,7 @@ export function Navbar({
           </div>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-6 shrink-0">
+          <div className="hidden md:flex items-center gap-4 shrink-0">
             <button
               onClick={() => scrollTo('scripts')}
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
@@ -101,6 +104,7 @@ export function Navbar({
             >
               FAQ
             </button>
+            <AuthButton />
             <div className="flex items-center gap-1">
               <ThemeToggle />
               <CurrencySwitcher />
@@ -221,6 +225,9 @@ export function Navbar({
             <div className="border-t border-border pt-2 mt-2 flex items-center justify-between">
               <span className="text-xs text-muted-foreground">Theme</span>
               <ThemeToggle />
+            </div>
+            <div className="border-t border-border pt-2 mt-2">
+              <AuthButton />
             </div>
           </div>
         )}

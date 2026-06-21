@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "next-themes";
+import { Providers } from "@/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
   keywords: ["FiveM", "GTA V", "Scripts", "ESX", "QBCore", "RLE Studios", "FiveM Resources"],
   authors: [{ name: "RLE Studios" }],
   icons: {
-    icon: "/logo.svg",
+    icon: "/Logo.png",
   },
 };
 
@@ -40,7 +41,9 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {children}
+          <Providers>
+            {children}
+          </Providers>
           <Toaster />
         </ThemeProvider>
       </body>

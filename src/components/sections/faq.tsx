@@ -44,7 +44,7 @@ const FAQS = [
 
 export function FAQ() {
   return (
-    <section id="faq" className="py-16 sm:py-20 border-t border-border bg-card/30">
+    <section id="faq" className="py-16 sm:py-20 border-t border-border bg-card/30 scroll-mt-24">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-primary text-xs font-semibold uppercase tracking-widest">

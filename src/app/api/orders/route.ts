@@ -16,6 +16,7 @@ interface OrderRequestBody {
   subtotal?: number
   discount?: number
   promoCode?: string
+  userId?: string
 }
 
 export async function POST(request: Request) {
@@ -51,6 +52,7 @@ export async function POST(request: Request) {
         discount: body.discount ?? 0,
         promoCode: body.promoCode?.toUpperCase() ?? null,
         status: 'completed',
+        userId: body.userId ?? null,
         items: {
           create: body.items.map((item) => ({
             productId: item.productId,
@@ -86,9 +88,13 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const url = new URL(request.url)
+    const email = url.searchParams.get('email')
+
     const orders = await db.order.findMany({
+      where: email ? { email: email.toLowerCase() } : undefined,
       include: { items: true },
       orderBy: { createdAt: 'desc' },
       take: 50,
