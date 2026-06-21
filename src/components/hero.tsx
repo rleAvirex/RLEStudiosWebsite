@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ArrowDown, Zap, Star, ShieldCheck, Download } from 'lucide-react'
+import { ArrowDown, Star, ShieldCheck, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AnimatedCounter } from '@/components/animated-counter'
 
@@ -65,15 +65,6 @@ export function Hero() {
             initial="hidden"
             animate="show"
           >
-            {/* Badge */}
-            <motion.div
-              variants={item}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-sm mb-6"
-            >
-              <Zap className="h-3.5 w-3.5" />
-              <span>Premium FiveM Resources</span>
-            </motion.div>
-
             {/* Main heading */}
             <motion.h1
               variants={item}

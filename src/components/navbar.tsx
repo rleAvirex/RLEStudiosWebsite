@@ -8,7 +8,6 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import {
   useCartStore,
   useWishlistStore,
-  useCompareStore,
   type Product,
 } from '@/lib/store'
 import { useState, useEffect } from 'react'
@@ -17,7 +16,6 @@ interface NavbarProps {
   onCartOpen: () => void
   onWishlistOpen: () => void
   onOrdersOpen: () => void
-  onCompareOpen: () => void
   products: Product[]
   onProductClick: (product: Product) => void
 }
@@ -26,7 +24,6 @@ export function Navbar({
   onCartOpen,
   onWishlistOpen,
   onOrdersOpen,
-  onCompareOpen,
   products,
   onProductClick,
 }: NavbarProps) {
@@ -35,7 +32,6 @@ export function Navbar({
   const [showSearch, setShowSearch] = useState(false)
   const totalItems = useCartStore((s) => s.totalItems())
   const wishlistCount = useWishlistStore((s) => s.ids.length)
-  const compareCount = useCompareStore((s) => s.ids.length)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -61,11 +57,6 @@ export function Navbar({
     </span>
   )
 
-  const compareBadge = compareCount > 0 && (
-    <span className="absolute -top-1 -right-1 h-5 w-5 accent-gradient text-white text-xs rounded-full flex items-center justify-center font-bold">
-      {compareCount}
-    </span>
-  )
 
   return (
     <nav
@@ -119,16 +110,6 @@ export function Navbar({
             <div className="flex items-center gap-1">
               <ThemeToggle />
               <CurrencySwitcher />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative text-muted-foreground hover:text-primary"
-                onClick={onCompareOpen}
-                aria-label="Compare"
-              >
-                <Package className="h-5 w-5" />
-                {compareBadge}
-              </Button>
               <Button
                 variant="ghost"
                 size="icon"
@@ -232,23 +213,6 @@ export function Navbar({
               About
             </button>
             <div className="border-t border-border pt-2 mt-2 flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 rounded-lg border-border"
-                onClick={() => {
-                  onCompareOpen()
-                  setMobileMenuOpen(false)
-                }}
-              >
-                <Package className="h-4 w-4 mr-1.5" />
-                Compare
-                {compareCount > 0 && (
-                  <span className="ml-1.5 accent-gradient text-white text-xs rounded-full px-1.5 py-0.5">
-                    {compareCount}
-                  </span>
-                )}
-              </Button>
               <Button
                 variant="outline"
                 size="sm"

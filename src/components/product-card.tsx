@@ -7,7 +7,6 @@ import {
   Check,
   Heart,
   TrendingUp,
-  GitCompare,
   MessageSquare,
   Tag,
   Eye,
@@ -19,7 +18,6 @@ import {
   type Product,
   useCartStore,
   useWishlistStore,
-  useCompareStore,
   useCurrencyStore,
   formatPrice,
 } from '@/lib/store'
@@ -40,9 +38,6 @@ export function ProductCard({ product, onViewDetail, onQuickView, featured, revi
   const addItem = useCartStore((s) => s.addItem)
   const toggleWishlist = useWishlistStore((s) => s.toggleItem)
   const isInWishlist = useWishlistStore((s) => s.ids.includes(product.id))
-  const toggleCompare = useCompareStore((s) => s.toggleItem)
-  const isInCompare = useCompareStore((s) => s.ids.includes(product.id))
-  const compareCount = useCompareStore((s) => s.ids.length)
   const currency = useCurrencyStore((s) => s.currency)
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -70,22 +65,6 @@ export function ProductCard({ product, onViewDetail, onQuickView, featured, revi
     })
   }
 
-  const handleToggleCompare = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!isInCompare && compareCount >= 3) {
-      toast({
-        title: 'Compare list full',
-        description: 'Remove an item from compare to add another (max 3).',
-        variant: 'destructive',
-      })
-      return
-    }
-    toggleCompare(product)
-    toast({
-      title: isInCompare ? 'Removed from compare' : 'Added to compare',
-      description: product.name,
-    })
-  }
 
   const hasDiscount = product.originalPrice && product.originalPrice > product.price
   const discountPercent = hasDiscount
@@ -126,7 +105,7 @@ export function ProductCard({ product, onViewDetail, onQuickView, featured, revi
         featured
           ? 'hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
           : 'hover:shadow-md hover:shadow-primary/5'
-      } ${isInCompare ? 'ring-1 ring-primary/40' : ''}`}
+      }`}
       onClick={() => onViewDetail(product)}
     >
       {/* Product Image */}
@@ -177,18 +156,6 @@ export function ProductCard({ product, onViewDetail, onQuickView, featured, revi
 
         {/* Action buttons - bottom right */}
         <div className="absolute bottom-3 right-3 flex items-center gap-1.5">
-          <button
-            onClick={handleToggleCompare}
-            className={`w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all ${
-              isInCompare
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-card/80 text-muted-foreground hover:text-primary'
-            }`}
-            aria-label={isInCompare ? 'Remove from compare' : 'Add to compare'}
-            title="Compare"
-          >
-            <GitCompare className="h-4 w-4" />
-          </button>
           <button
             onClick={handleToggleWishlist}
             className={`w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all ${

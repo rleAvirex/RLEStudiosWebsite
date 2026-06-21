@@ -7,7 +7,6 @@ import {
   Code,
   Check,
   Heart,
-  GitCompare,
   Eye,
   X,
   TrendingUp,
@@ -23,7 +22,6 @@ import {
   type Product,
   useCartStore,
   useWishlistStore,
-  useCompareStore,
   useCurrencyStore,
   formatPrice,
 } from '@/lib/store'
@@ -49,9 +47,6 @@ export function QuickViewDialog({
   const addItem = useCartStore((s) => s.addItem)
   const toggleWishlist = useWishlistStore((s) => s.toggleItem)
   const isInWishlist = useWishlistStore((s) => (product ? s.ids.includes(product.id) : false))
-  const toggleCompare = useCompareStore((s) => s.toggleItem)
-  const isInCompare = useCompareStore((s) => (product ? s.ids.includes(product.id) : false))
-  const compareCount = useCompareStore((s) => s.ids.length)
   const currency = useCurrencyStore((s) => s.currency)
 
   if (!product) return null
@@ -78,21 +73,6 @@ export function QuickViewDialog({
     })
   }
 
-  const handleToggleCompare = () => {
-    if (!isInCompare && compareCount >= 3) {
-      toast({
-        title: 'Compare list full',
-        description: 'Remove an item from compare to add another (max 3).',
-        variant: 'destructive',
-      })
-      return
-    }
-    toggleCompare(product)
-    toast({
-      title: isInCompare ? 'Removed from compare' : 'Added to compare',
-      description: product.name,
-    })
-  }
 
   const hasDiscount = product.originalPrice && product.originalPrice > product.price
   const discountPercent = hasDiscount
@@ -237,17 +217,6 @@ export function QuickViewDialog({
                 >
                   View Details
                   <ArrowRight className="h-3.5 w-3.5 ml-1" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className={`rounded-lg h-9 w-9 ${
-                    isInCompare ? 'border-primary text-primary' : 'border-border text-muted-foreground'
-                  }`}
-                  onClick={handleToggleCompare}
-                  title="Compare"
-                >
-                  <GitCompare className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="outline"

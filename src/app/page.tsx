@@ -9,7 +9,6 @@ import { QuickViewDialog } from '@/components/quick-view-dialog'
 import { CartSheet } from '@/components/cart-sheet'
 import { WishlistSheet } from '@/components/wishlist-sheet'
 import { CheckoutDialog } from '@/components/checkout-dialog'
-import { CompareSheet } from '@/components/compare-sheet'
 import { MyOrdersSheet } from '@/components/my-orders-sheet'
 import { Footer } from '@/components/footer'
 import { BackToTop } from '@/components/back-to-top'
@@ -68,7 +67,6 @@ export default function Home() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
   const [quickViewOpen, setQuickViewOpen] = useState(false)
-  const [compareOpen, setCompareOpen] = useState(false)
   const [ordersOpen, setOrdersOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -220,7 +218,6 @@ export default function Home() {
         onCartOpen={() => setCartOpen(true)}
         onWishlistOpen={() => setWishlistOpen(true)}
         onOrdersOpen={() => setOrdersOpen(true)}
-        onCompareOpen={() => setCompareOpen(true)}
         products={products}
         onProductClick={openDetail}
       />
@@ -438,11 +435,6 @@ export default function Home() {
       <WishlistSheet
         open={wishlistOpen}
         onOpenChange={setWishlistOpen}
-        onViewDetail={openDetail}
-      />
-      <CompareSheet
-        open={compareOpen}
-        onOpenChange={setCompareOpen}
         onViewDetail={openDetail}
       />
       <MyOrdersSheet open={ordersOpen} onOpenChange={setOrdersOpen} />

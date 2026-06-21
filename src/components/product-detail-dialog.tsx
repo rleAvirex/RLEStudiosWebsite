@@ -13,7 +13,6 @@ import {
   ShieldCheck,
   Download,
   RefreshCw,
-  GitCompare,
   MessageSquare,
   Tag,
   Sparkles,
@@ -31,7 +30,6 @@ import {
   type Product,
   useCartStore,
   useWishlistStore,
-  useCompareStore,
   useCurrencyStore,
   formatPrice,
 } from '@/lib/store'
@@ -69,9 +67,6 @@ export function ProductDetailDialog({
   const addItem = useCartStore((s) => s.addItem)
   const toggleWishlist = useWishlistStore((s) => s.toggleItem)
   const isInWishlist = useWishlistStore((s) => (product ? s.ids.includes(product.id) : false))
-  const toggleCompare = useCompareStore((s) => s.toggleItem)
-  const isInCompare = useCompareStore((s) => (product ? s.ids.includes(product.id) : false))
-  const compareCount = useCompareStore((s) => s.ids.length)
   const currency = useCurrencyStore((s) => s.currency)
 
   if (!product) return null
@@ -99,21 +94,6 @@ export function ProductDetailDialog({
     })
   }
 
-  const handleToggleCompare = () => {
-    if (!isInCompare && compareCount >= 3) {
-      toast({
-        title: 'Compare list full',
-        description: 'Remove an item from compare to add another (max 3).',
-        variant: 'destructive',
-      })
-      return
-    }
-    toggleCompare(product)
-    toast({
-      title: isInCompare ? 'Removed from compare' : 'Added to compare',
-      description: product.name,
-    })
-  }
 
   const hasDiscount = product.originalPrice && product.originalPrice > product.price
   const discountPercent = hasDiscount
@@ -325,24 +305,7 @@ export function ProductDetailDialog({
             <Button
               variant="outline"
               size="lg"
-              className={`rounded-xl px-4 ${
-                isInCompare
-                  ? 'border-primary text-primary'
-                  : 'border-border text-muted-foreground hover:text-primary hover:border-primary/40'
-              }`}
-              onClick={handleToggleCompare}
-              title="Compare"
-            >
-              <GitCompare className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className={`rounded-xl px-4 ${
-                isInWishlist
-                  ? 'border-primary text-primary'
-                  : 'border-border text-muted-foreground hover:text-primary hover:border-primary/40'
-              }`}
+              className="rounded-xl px-4 border-border text-muted-foreground hover:text-primary hover:border-primary/40"
               onClick={handleToggleWishlist}
               title="Wishlist"
             >
