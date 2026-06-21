@@ -20,7 +20,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
-import { useCartStore } from '@/lib/store'
+import { useCartStore, useCurrencyStore, formatPrice } from '@/lib/store'
 
 interface CartSheetProps {
   open: boolean
@@ -42,6 +42,7 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
     finalTotal,
     clearCart,
   } = useCartStore()
+  const currency = useCurrencyStore((s) => s.currency)
 
   const handleCheckout = () => {
     if (items.length === 0) return
@@ -105,12 +106,12 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
                     <h4 className="text-sm font-medium truncate">{item.product.name}</h4>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-primary font-semibold text-sm">
-                        €{item.product.price.toFixed(2)}
+                      {formatPrice(item.product.price, currency)}
                       </span>
                       {item.product.originalPrice &&
                         item.product.originalPrice > item.product.price && (
                           <span className="text-xs text-muted-foreground line-through">
-                            €{item.product.originalPrice.toFixed(2)}
+                            {formatPrice(item.product.originalPrice, currency)}
                           </span>
                         )}
                     </div>
@@ -155,7 +156,7 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
                   <Gift className="h-3.5 w-3.5 shrink-0" />
                   <span>
                     Bundle deal applied! 30% off {featuredCount} featured scripts
-                    (−€{bundleDiscount().toFixed(2)})
+                    (−{formatPrice(bundleDiscount(), currency)})
                   </span>
                 </div>
               ) : (
@@ -190,13 +191,13 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
               <div className="space-y-1.5">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>€{subtotal().toFixed(2)}</span>
+                  <span>{formatPrice(subtotal(), currency)}</span>
                 </div>
                 {totalSavings() > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-green-500">Product savings</span>
                     <span className="text-green-500 font-medium">
-                      −€{totalSavings().toFixed(2)}
+                      −{formatPrice(totalSavings(), currency)}
                     </span>
                   </div>
                 )}
@@ -206,7 +207,7 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
                       <Gift className="h-3 w-3" /> Bundle deal (30%)
                     </span>
                     <span className="text-green-500 font-medium">
-                      −€{bundleDiscount().toFixed(2)}
+                      −{formatPrice(bundleDiscount(), currency)}
                     </span>
                   </div>
                 )}
@@ -223,13 +224,13 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
                       </button>
                     </span>
                     <span className="text-green-500 font-medium">
-                      −€{promo.discount.toFixed(2)}
+                      −{formatPrice(promo.discount, currency)}
                     </span>
                   </div>
                 )}
                 <div className="flex justify-between font-semibold text-lg pt-1">
                   <span>Total</span>
-                  <span className="text-primary">€{finalTotal().toFixed(2)}</span>
+                  <span className="text-primary">{formatPrice(finalTotal(), currency)}</span>
                 </div>
               </div>
 
@@ -238,7 +239,7 @@ export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
                 onClick={handleCheckout}
               >
-                Checkout — €{finalTotal().toFixed(2)}
+                Checkout — {formatPrice(finalTotal(), currency)}
               </Button>
               <Button
                 variant="ghost"

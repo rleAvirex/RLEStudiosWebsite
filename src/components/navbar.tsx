@@ -3,6 +3,7 @@
 import { ShoppingCart, Menu, X, Heart, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NavbarSearch } from '@/components/navbar-search'
+import { CurrencySwitcher } from '@/components/currency-switcher'
 import {
   useCartStore,
   useWishlistStore,
@@ -115,6 +116,7 @@ export function Navbar({
               FAQ
             </button>
             <div className="flex items-center gap-1">
+              <CurrencySwitcher />
               <Button
                 variant="ghost"
                 size="icon"
@@ -257,6 +259,10 @@ export function Navbar({
                 <Package className="h-4 w-4 mr-1.5" />
                 My Orders
               </Button>
+            </div>
+            <div className="border-t border-border pt-2 mt-2 flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Currency</span>
+              <CurrencySwitcher />
             </div>
           </div>
         )}

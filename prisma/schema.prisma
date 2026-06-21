@@ -82,3 +82,14 @@ model NewsletterSubscriber {
   email     String   @unique
   createdAt DateTime @default(now())
 }
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  name      String
+  rating    Int
+  title     String
+  comment   String
+  helpful   Int      @default(0)
+  createdAt DateTime @default(now())
+}

@@ -9,7 +9,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
-import { useCompareStore, useCartStore, type Product } from '@/lib/store'
+import { useCompareStore, useCartStore, useCurrencyStore, formatPrice, type Product } from '@/lib/store'
 import { toast } from '@/hooks/use-toast'
 
 interface CompareSheetProps {
@@ -21,6 +21,7 @@ interface CompareSheetProps {
 export function CompareSheet({ open, onOpenChange, onViewDetail }: CompareSheetProps) {
   const { items, removeItem, clear } = useCompareStore()
   const addItem = useCartStore((s) => s.addItem)
+  const currency = useCurrencyStore((s) => s.currency)
 
   const handleAddToCart = (product: Product) => {
     addItem(product)
@@ -34,7 +35,7 @@ export function CompareSheet({ open, onOpenChange, onViewDetail }: CompareSheetP
   const rows: { label: string; render: (p: Product) => React.ReactNode; best?: (p: Product) => boolean }[] = [
     {
       label: 'Price',
-      render: (p) => <span className="font-bold text-primary">€{p.price.toFixed(2)}</span>,
+      render: (p) => <span className="font-bold text-primary">{formatPrice(p.price, currency)}</span>,
     },
     {
       label: 'Category',

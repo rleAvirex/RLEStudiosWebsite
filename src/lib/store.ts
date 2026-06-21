@@ -18,9 +18,40 @@ export interface Product {
   lastUpdated: string
 }
 
+export interface Review {
+  id: string
+  productId: string
+  name: string
+  rating: number
+  title: string
+  comment: string
+  helpful: number
+  createdAt: string
+}
+
 export interface CartItem {
   product: Product
   quantity: number
+}
+
+export type Currency = 'EUR' | 'USD' | 'GBP'
+
+export const CURRENCY_RATES: Record<Currency, number> = {
+  EUR: 1,
+  USD: 1.08,
+  GBP: 0.85,
+}
+
+export const CURRENCY_SYMBOLS: Record<Currency, string> = {
+  EUR: '€',
+  USD: '$',
+  GBP: '£',
+}
+
+export function formatPrice(eurPrice: number, currency: Currency): string {
+  const converted = eurPrice * CURRENCY_RATES[currency]
+  const symbol = CURRENCY_SYMBOLS[currency]
+  return `${symbol}${converted.toFixed(2)}`
 }
 
 export interface AppliedPromo {
@@ -275,6 +306,24 @@ export const useMyOrdersStore = create<MyOrdersStore>()(
     }),
     {
       name: 'rle-orders',
+    }
+  )
+)
+
+// Currency store (persisted)
+interface CurrencyStore {
+  currency: Currency
+  setCurrency: (c: Currency) => void
+}
+
+export const useCurrencyStore = create<CurrencyStore>()(
+  persist(
+    (set) => ({
+      currency: 'EUR',
+      setCurrency: (currency) => set({ currency }),
+    }),
+    {
+      name: 'rle-currency',
     }
   )
 )

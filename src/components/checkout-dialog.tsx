@@ -23,7 +23,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
-import { useCartStore, useMyOrdersStore } from '@/lib/store'
+import { useCartStore, useMyOrdersStore, useCurrencyStore, formatPrice } from '@/lib/store'
 import { toast } from '@/hooks/use-toast'
 
 interface CheckoutDialogProps {
@@ -45,6 +45,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
     clearCart,
   } = useCartStore()
   const addOrder = useMyOrdersStore((s) => s.addOrder)
+  const currency = useCurrencyStore((s) => s.currency)
   const [step, setStep] = useState<Step>('details')
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
@@ -231,7 +232,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                         <span className="text-xs">×{item.quantity}</span>
                       </span>
                       <span className="font-medium whitespace-nowrap">
-                        €{(item.product.price * item.quantity).toFixed(2)}
+                        {formatPrice(item.product.price * item.quantity, currency)}
                       </span>
                     </div>
                   ))}
@@ -239,13 +240,13 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                 <Separator className="bg-border" />
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>€{subtotal().toFixed(2)}</span>
+                  <span>{formatPrice(subtotal(), currency)}</span>
                 </div>
                 {totalSavings(items) > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-green-500">Product savings</span>
                     <span className="text-green-500 font-medium">
-                      −€{totalSavings(items).toFixed(2)}
+                      −{formatPrice(totalSavings(items), currency)}
                     </span>
                   </div>
                 )}
@@ -255,7 +256,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                       <Gift className="h-3 w-3" /> Bundle (30%)
                     </span>
                     <span className="text-green-500 font-medium">
-                      −€{bundleDiscount().toFixed(2)}
+                      −{formatPrice(bundleDiscount(), currency)}
                     </span>
                   </div>
                 )}
@@ -273,14 +274,14 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                       </button>
                     </span>
                     <span className="text-green-500 font-medium">
-                      −€{promo.discount.toFixed(2)}
+                      −{formatPrice(promo.discount, currency)}
                     </span>
                   </div>
                 )}
                 <Separator className="bg-border" />
                 <div className="flex justify-between font-semibold text-lg">
                   <span>Total</span>
-                  <span className="text-primary">€{finalTotal().toFixed(2)}</span>
+                  <span className="text-primary">{formatPrice(finalTotal(), currency)}</span>
                 </div>
               </div>
 
@@ -383,7 +384,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                 type="submit"
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-11 font-semibold"
               >
-                Complete Purchase — €{finalTotal().toFixed(2)}
+                Complete Purchase — {formatPrice(finalTotal(), currency)}
               </Button>
               <p className="text-[11px] text-muted-foreground text-center">
                 This is a demo checkout — no real payment will be processed.

@@ -212,3 +212,92 @@ Unresolved / Next Steps:
 - Could add quantity-based bundle deals (e.g., buy 2 of same script get 10% off)
 - Could add wishlist sharing (generate shareable URL)
 - Could add recently searched terms persistence
+
+---
+Task ID: 4
+Agent: Cron Review Agent (Round 3)
+Task: QA test the site, then add more features and improve styling per user request
+
+Work Log:
+- Reviewed worklog.md — site was stable from Task ID 3 with promo codes, bundle deals, comparison, my orders, navbar search, hero animations, back-to-top
+- Ran ESLint check — passes clean
+- QA tested with agent-browser: confirmed all existing features functional
+- Selected work focus: Product reviews system, currency switcher, Discord widget, quick filter tabs (Trending/New Arrivals), skeleton loaders, toast action button
+
+Backend additions:
+- Added Review model to Prisma schema (id, productId, name, rating, title, comment, helpful, createdAt)
+- Pushed schema, regenerated Prisma client, restarted dev server
+- Created /api/reviews GET (filter by productId) + POST (create review, auto-updates product.rating average)
+- Created /api/reviews/seed POST — seeds 21 sample reviews across 9 products (2-3 reviews each)
+- Fixed seed matching logic (used .find() on SAMPLE_REVIEWS array instead of Object.keys())
+
+Store enhancements (src/lib/store.ts):
+- Added Review interface
+- Added Currency type ('EUR' | 'USD' | 'GBP'), CURRENCY_RATES, CURRENCY_SYMBOLS
+- Added formatPrice(eurPrice, currency) helper function
+- Added useCurrencyStore (persist) with currency + setCurrency
+
+New components:
+- CurrencySwitcher (src/components/currency-switcher.tsx) — dropdown with EUR/USD/GBP, shows symbol + label, persisted to localStorage, renders in navbar (desktop + mobile menu)
+- DiscordWidget (src/components/discord-widget.tsx) — floating CTA card appears after 1000px scroll, dismissible, shows "Need help choosing?" with Join Discord link
+- SkeletonCard + SkeletonGrid (src/components/skeleton-card.tsx) — animated pulse placeholder cards for product grid loading state
+- ReviewsSection (src/components/reviews-section.tsx) — full reviews UI: rating summary (avg + distribution bars), review list with avatars/stars/dates, "Write Review" form with star rating picker, "Show More" pagination, fetches from /api/reviews?productId=, submits via POST
+
+Enhanced existing components:
+- ProductCard: added reviewCount prop (shows "(N)" next to rating), added onCartOpen prop (toast action button), currency-aware prices via formatPrice()
+- ProductDetailDialog: added ReviewsSection at bottom, shows review count in rating row, currency-aware prices, toast action button on add-to-cart
+- Navbar: added CurrencySwitcher in desktop nav bar + mobile menu
+- CartSheet: currency-aware prices for all line items, subtotal, savings, bundle, promo, total
+- CheckoutDialog: currency-aware prices throughout order summary
+- CompareSheet: currency-aware price comparison
+- WishlistSheet: currency-aware prices
+- NavbarSearch: currency-aware suggestion prices
+- page.tsx: added quick filter tabs (All/Trending/New Arrivals), skeleton grid for loading, fetches reviews on init, builds reviewCounts map, passes reviewCount + onCartOpen to all ProductCard instances
+
+Quick filter logic:
+- "All" = no filter
+- "Trending" = top 4 products by salesCount × rating
+- "New Arrivals" = 3 most recently created products (by createdAt)
+
+Bug fixes during development:
+- Fixed ESLint error in currency-switcher.tsx: removed setState-in-effect pattern (mounted state), used direct render with useEffect for Escape key handler only
+- Fixed toast action type: changed from {label, onClick} object to <ToastAction> React element to match ToastActionElement type
+- Fixed reviews seed matching: changed from Object.keys().find() to SAMPLE_REVIEWS.find() to correctly match products by image path
+
+QA verification via agent-browser:
+- Navbar shows: Currency switcher (EUR), Compare, My Orders, Wishlist, Cart badges
+- Currency switcher: clicking opens dropdown with EUR/USD/GBP, selecting USD converts all prices (€24.99 → $26.99, 24.99×1.08=26.99 ✓)
+- Product cards: show review count "(3)" next to rating, prices in selected currency
+- Quick filter tabs: All (9 products), Trending (4 products), New Arrivals (3 products) — verified via JS DOM count
+- Product detail dialog: shows "Customer Reviews (3)" section with 3 reviews, "Write Review" button, price in USD ($21.59)
+- Review submission: filled form (name, 5 stars, title, comment), submitted, review count went 3→4, "Show More Reviews (1 remaining)" appeared
+- DB verification: 22 reviews in DB (up from 21), new review "TestUser 5★ Great product!" saved
+- Toast action: "View Cart" button appears on add-to-cart toast
+- Discord widget: appears after scrolling 1000px, shows "Need help choosing?" with Join Discord link
+- Back-to-top button: appears after scrolling
+- Mobile (375x812): navbar shows logo + wishlist + cart + menu, search box below, mobile menu includes Currency switcher + Compare + My Orders
+
+Stage Summary:
+- Site now has 6 major new features: product reviews (with DB persistence + auto-rating-recalculation), currency switcher (EUR/USD/GBP), Discord widget, quick filter tabs (Trending/New Arrivals), skeleton loaders, toast action button
+- Visual polish: skeleton loading animation, Discord widget card, rating distribution bars in reviews, currency symbols throughout
+- Backend expanded: 8 API routes total (products, seed, orders, newsletter, promo-codes, promo-codes/validate, reviews, reviews/seed)
+- Database schema expanded: Review model added
+- 21 sample reviews seeded across 9 products
+- All ESLint checks pass
+- All QA tests passed: currency switching, review submission, quick filters, mobile responsive
+
+Unresolved / Next Steps:
+- Could add user accounts/authentication (NextAuth.js available) to tie reviews/orders to accounts
+- Could add admin panel for managing products, promo codes, and moderating reviews
+- Could add download center (actual file delivery, currently just a button)
+- Could add product screenshots gallery in detail dialog
+- Could add live chat / Discord widget integration (currently just a CTA)
+- Could add email notifications for newsletter subscribers
+- Could add quantity-based bundle deals (e.g., buy 2 of same script get 10% off)
+- Could add wishlist sharing (generate shareable URL)
+- Could add recently searched terms persistence
+- Could add product tags/keywords for better search
+- Could add "verified purchase" badge on reviews (requires order history linkage)
+- Could add review helpfulness voting (currently just a display)
+- Could add currency conversion fee notice
+- Note: dev server requires manual restart when Prisma schema changes (recurring issue since Task ID 2)

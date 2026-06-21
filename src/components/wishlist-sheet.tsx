@@ -8,7 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { useWishlistStore, useCartStore, type Product } from '@/lib/store'
+import { useWishlistStore, useCartStore, useCurrencyStore, formatPrice, type Product } from '@/lib/store'
 import { toast } from '@/hooks/use-toast'
 
 interface WishlistSheetProps {
@@ -20,6 +20,7 @@ interface WishlistSheetProps {
 export function WishlistSheet({ open, onOpenChange, onViewDetail }: WishlistSheetProps) {
   const { items, removeItem } = useWishlistStore()
   const addItem = useCartStore((s) => s.addItem)
+  const currency = useCurrencyStore((s) => s.currency)
 
   const handleAddToCart = (product: Product) => {
     addItem(product)
@@ -86,7 +87,7 @@ export function WishlistSheet({ open, onOpenChange, onViewDetail }: WishlistShee
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-medium truncate">{product.name}</h4>
                   <p className="text-primary font-semibold text-sm mt-0.5">
-                    €{product.price.toFixed(2)}
+                    {formatPrice(product.price, currency)}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <Button

@@ -13,6 +13,7 @@ import {
   Download,
   RefreshCw,
   GitCompare,
+  MessageSquare,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -27,22 +28,35 @@ import {
   useCartStore,
   useWishlistStore,
   useCompareStore,
+  useCurrencyStore,
+  formatPrice,
 } from '@/lib/store'
 import { toast } from '@/hooks/use-toast'
+import { ToastAction } from '@/components/ui/toast'
+import { ReviewsSection } from '@/components/reviews-section'
 
 interface ProductDetailDialogProps {
   product: Product | null
   open: boolean
   onOpenChange: (open: boolean) => void
+  reviewCounts?: Record<string, number>
+  onCartOpen?: () => void
 }
 
-export function ProductDetailDialog({ product, open, onOpenChange }: ProductDetailDialogProps) {
+export function ProductDetailDialog({
+  product,
+  open,
+  onOpenChange,
+  reviewCounts = {},
+  onCartOpen,
+}: ProductDetailDialogProps) {
   const addItem = useCartStore((s) => s.addItem)
   const toggleWishlist = useWishlistStore((s) => s.toggleItem)
   const isInWishlist = useWishlistStore((s) => (product ? s.ids.includes(product.id) : false))
   const toggleCompare = useCompareStore((s) => s.toggleItem)
   const isInCompare = useCompareStore((s) => (product ? s.ids.includes(product.id) : false))
   const compareCount = useCompareStore((s) => s.ids.length)
+  const currency = useCurrencyStore((s) => s.currency)
 
   if (!product) return null
 
@@ -51,6 +65,11 @@ export function ProductDetailDialog({ product, open, onOpenChange }: ProductDeta
     toast({
       title: 'Added to cart',
       description: `${product.name} has been added to your cart.`,
+      action: onCartOpen ? (
+        <ToastAction altText="View Cart" onClick={onCartOpen}>
+          View Cart
+        </ToastAction>
+      ) : undefined,
     })
   }
 
@@ -82,6 +101,8 @@ export function ProductDetailDialog({ product, open, onOpenChange }: ProductDeta
   const discountPercent = hasDiscount
     ? Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)
     : 0
+
+  const reviewCount = reviewCounts[product.id] ?? 0
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -131,6 +152,11 @@ export function ProductDetailDialog({ product, open, onOpenChange }: ProductDeta
                   </div>
                   <span className="text-muted-foreground text-xs">·</span>
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <MessageSquare className="h-3 w-3" />
+                    {reviewCount} review{reviewCount !== 1 ? 's' : ''}
+                  </span>
+                  <span className="text-muted-foreground text-xs">·</span>
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     <TrendingUp className="h-3 w-3" />
                     {product.salesCount.toLocaleString()} sales
                   </span>
@@ -138,11 +164,11 @@ export function ProductDetailDialog({ product, open, onOpenChange }: ProductDeta
               </div>
               <div className="text-right shrink-0">
                 <div className="text-3xl font-bold text-primary">
-                  €{product.price.toFixed(2)}
+                  {formatPrice(product.price, currency)}
                 </div>
                 {hasDiscount && (
                   <div className="text-sm text-muted-foreground line-through">
-                    €{product.originalPrice!.toFixed(2)}
+                    {formatPrice(product.originalPrice!, currency)}
                   </div>
                 )}
               </div>
@@ -214,7 +240,7 @@ export function ProductDetailDialog({ product, open, onOpenChange }: ProductDeta
               onClick={handleAddToCart}
             >
               <ShoppingCart className="h-5 w-5 mr-2" />
-              Add to Cart — €{product.price.toFixed(2)}
+              Add to Cart — {formatPrice(product.price, currency)}
             </Button>
             <Button
               variant="outline"
@@ -243,6 +269,9 @@ export function ProductDetailDialog({ product, open, onOpenChange }: ProductDeta
               <Heart className={`h-5 w-5 ${isInWishlist ? 'fill-current' : ''}`} />
             </Button>
           </div>
+
+          {/* Reviews section */}
+          <ReviewsSection productId={product.id} />
         </div>
       </DialogContent>
     </Dialog>

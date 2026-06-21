@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { Search, X, TrendingUp } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { type Product } from '@/lib/store'
+import { type Product, useCurrencyStore, formatPrice } from '@/lib/store'
 
 interface NavbarSearchProps {
   products: Product[]
@@ -15,6 +15,7 @@ export function NavbarSearch({ products, onProductClick, onFocus }: NavbarSearch
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const currency = useCurrencyStore((s) => s.currency)
 
   // Compute suggestions via useMemo — no setState in effect
   const suggestions = useMemo(() => {
@@ -108,7 +109,7 @@ export function NavbarSearch({ products, onProductClick, onFocus }: NavbarSearch
                   </div>
                   <div className="text-right shrink-0">
                     <div className="text-sm font-bold text-primary">
-                      €{product.price.toFixed(2)}
+                      {formatPrice(product.price, currency)}
                     </div>
                     {product.salesCount > 1000 && (
                       <div className="text-[10px] text-muted-foreground flex items-center gap-0.5 justify-end">

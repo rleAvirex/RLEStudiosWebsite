@@ -8,26 +8,38 @@ import {
   Heart,
   TrendingUp,
   GitCompare,
+  MessageSquare,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { type Product, useCartStore, useWishlistStore, useCompareStore } from '@/lib/store'
+import {
+  type Product,
+  useCartStore,
+  useWishlistStore,
+  useCompareStore,
+  useCurrencyStore,
+  formatPrice,
+} from '@/lib/store'
 import { toast } from '@/hooks/use-toast'
+import { ToastAction } from '@/components/ui/toast'
 
 interface ProductCardProps {
   product: Product
   onViewDetail: (product: Product) => void
   featured?: boolean
+  reviewCount?: number
+  onCartOpen?: () => void
 }
 
-export function ProductCard({ product, onViewDetail, featured }: ProductCardProps) {
+export function ProductCard({ product, onViewDetail, featured, reviewCount = 0, onCartOpen }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem)
   const toggleWishlist = useWishlistStore((s) => s.toggleItem)
   const isInWishlist = useWishlistStore((s) => s.ids.includes(product.id))
   const toggleCompare = useCompareStore((s) => s.toggleItem)
   const isInCompare = useCompareStore((s) => s.ids.includes(product.id))
   const compareCount = useCompareStore((s) => s.ids.length)
+  const currency = useCurrencyStore((s) => s.currency)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -35,6 +47,13 @@ export function ProductCard({ product, onViewDetail, featured }: ProductCardProp
     toast({
       title: 'Added to cart',
       description: `${product.name} has been added to your cart.`,
+      action: onCartOpen
+        ? (
+            <ToastAction altText="View Cart" onClick={onCartOpen}>
+              View Cart
+            </ToastAction>
+          )
+        : undefined,
     })
   }
 
@@ -71,20 +90,28 @@ export function ProductCard({ product, onViewDetail, featured }: ProductCardProp
 
   const renderStars = (rating: number) => {
     return (
-      <div className="flex items-center gap-0.5">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star
-            key={i}
-            className={`h-3 w-3 ${
-              i < Math.floor(rating)
-                ? 'fill-primary text-primary'
-                : i < rating
-                ? 'fill-primary/50 text-primary/50'
-                : 'text-muted-foreground/40'
-            }`}
-          />
-        ))}
-        <span className="text-xs text-muted-foreground ml-1">{rating.toFixed(1)}</span>
+      <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Star
+              key={i}
+              className={`h-3 w-3 ${
+                i < Math.floor(rating)
+                  ? 'fill-primary text-primary'
+                  : i < rating
+                  ? 'fill-primary/50 text-primary/50'
+                  : 'text-muted-foreground/40'
+              }`}
+            />
+          ))}
+        </div>
+        <span className="text-xs text-muted-foreground">{rating.toFixed(1)}</span>
+        {reviewCount > 0 && (
+          <span className="text-xs text-muted-foreground flex items-center gap-0.5">
+            (<MessageSquare className="h-2.5 w-2.5" />
+            {reviewCount})
+          </span>
+        )}
       </div>
     )
   }
@@ -171,11 +198,11 @@ export function ProductCard({ product, onViewDetail, featured }: ProductCardProp
           </h3>
           <div className="text-right shrink-0">
             <div className="text-primary font-bold text-base sm:text-lg whitespace-nowrap">
-              €{product.price.toFixed(2)}
+              {formatPrice(product.price, currency)}
             </div>
             {hasDiscount && (
               <div className="text-xs text-muted-foreground line-through">
-                €{product.originalPrice!.toFixed(2)}
+                {formatPrice(product.originalPrice!, currency)}
               </div>
             )}
           </div>
