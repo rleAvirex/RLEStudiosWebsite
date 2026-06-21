@@ -11,19 +11,23 @@ datasource db {
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  description String
-  price       Float
-  category    String
-  image       String
-  features    String   // JSON string of features array
-  isFeatured  Boolean  @default(false)
-  version     String   @default("1.0.0")
-  framework   String   @default("ESX / QBCore")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  cartItems   CartItem[]
+  id            String   @id @default(cuid())
+  name          String
+  description   String
+  price         Float
+  originalPrice Float?
+  category      String
+  image         String
+  features      String   // JSON string of features array
+  isFeatured    Boolean  @default(false)
+  version       String   @default("1.0.0")
+  framework     String   @default("ESX / QBCore")
+  rating        Float    @default(5.0)
+  salesCount    Int      @default(0)
+  lastUpdated   String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  cartItems     CartItem[]
 }
 
 model CartItem {
@@ -40,7 +44,7 @@ model Order {
   email     String
   name      String
   totalPrice Float
-  status    String      @default("pending")
+  status    String      @default("completed")
   items     OrderItem[]
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
@@ -54,4 +58,10 @@ model OrderItem {
   price     Float
   quantity  Int     @default(1)
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
 }

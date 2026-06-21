@@ -10,6 +10,7 @@ export async function GET() {
     const formatted = products.map((p) => ({
       ...p,
       features: JSON.parse(p.features),
+      originalPrice: p.originalPrice ?? undefined,
     }))
 
     return NextResponse.json(formatted)

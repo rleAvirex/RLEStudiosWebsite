@@ -6,31 +6,58 @@ import { Hero } from '@/components/hero'
 import { ProductCard } from '@/components/product-card'
 import { ProductDetailDialog } from '@/components/product-detail-dialog'
 import { CartSheet } from '@/components/cart-sheet'
+import { WishlistSheet } from '@/components/wishlist-sheet'
+import { CheckoutDialog } from '@/components/checkout-dialog'
 import { Footer } from '@/components/footer'
-import { type Product } from '@/lib/store'
-import { Badge } from '@/components/ui/badge'
+import { Features } from '@/components/sections/features'
+import { Testimonials } from '@/components/sections/testimonials'
+import { FAQ } from '@/components/sections/faq'
+import { Newsletter } from '@/components/sections/newsletter'
+import { CTABanner } from '@/components/sections/cta-banner'
+import { StatsBanner } from '@/components/sections/stats-banner'
+import { RecentlyViewed } from '@/components/sections/recently-viewed'
+import { type Product, useRecentlyViewedStore } from '@/lib/store'
 import { Input } from '@/components/ui/input'
-import { Search, Filter, Sparkles, Loader2 } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Search, Filter, Sparkles, Loader2, ArrowDownUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const CATEGORIES = ['All', 'Vehicle', 'UI', 'Economy', 'Property', 'Job', 'Core']
+
+type SortOption = 'newest' | 'price-low' | 'price-high' | 'popular' | 'rating'
+
+const SORT_LABELS: Record<SortOption, string> = {
+  newest: 'Newest',
+  'price-low': 'Price: Low to High',
+  'price-high': 'Price: High to Low',
+  popular: 'Most Popular',
+  rating: 'Top Rated',
+}
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([])
   const [featured, setFeatured] = useState<Product[]>([])
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [cartOpen, setCartOpen] = useState(false)
+  const [wishlistOpen, setWishlistOpen] = useState(false)
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
+  const [sort, setSort] = useState<SortOption>('popular')
+  const addRecentlyViewed = useRecentlyViewedStore((s) => s.add)
 
   useEffect(() => {
     async function init() {
       try {
-        // Seed the database
         await fetch('/api/seed', { method: 'POST' })
-        // Fetch products
         const res = await fetch('/api/products')
         const data = await res.json()
         setProducts(data)
@@ -47,30 +74,76 @@ export default function Home() {
   const openDetail = (product: Product) => {
     setSelectedProduct(product)
     setDetailOpen(true)
+    addRecentlyViewed(product)
   }
 
-  const filteredProducts = products.filter((p) => {
-    const matchesSearch =
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.description.toLowerCase().includes(search.toLowerCase())
-    const matchesCategory = category === 'All' || p.category === category
-    return matchesSearch && matchesCategory
-  })
+  const filteredProducts = products
+    .filter((p) => {
+      const matchesSearch =
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        p.description.toLowerCase().includes(search.toLowerCase())
+      const matchesCategory = category === 'All' || p.category === category
+      return matchesSearch && matchesCategory
+    })
+    .sort((a, b) => {
+      switch (sort) {
+        case 'price-low':
+          return a.price - b.price
+        case 'price-high':
+          return b.price - a.price
+        case 'popular':
+          return b.salesCount - a.salesCount
+        case 'rating':
+          return b.rating - a.rating
+        case 'newest':
+        default:
+          return 0 // Keep original order (already desc by createdAt)
+      }
+    })
+
+  const scrollToScripts = () => {
+    document.getElementById('scripts')?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar onCartOpen={() => setCartOpen(true)} />
+      <Navbar
+        onCartOpen={() => setCartOpen(true)}
+        onWishlistOpen={() => setWishlistOpen(true)}
+      />
 
       <main className="flex-1">
         <Hero />
+
+        {/* Stats banner right after hero */}
+        <StatsBanner />
 
         {/* Featured Section */}
         {featured.length > 0 && (
           <section id="featured" className="py-16 sm:py-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex items-center gap-3 mb-8">
-                <Sparkles className="h-5 w-5 text-primary" />
-                <h2 className="text-2xl sm:text-3xl font-bold">Featured Scripts</h2>
+              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    <span className="text-primary text-xs font-semibold uppercase tracking-widest">
+                      Hand-picked
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+                    Featured Scripts
+                  </h2>
+                  <p className="text-muted-foreground text-sm mt-2">
+                    Our most popular and best-rated scripts, chosen by the community.
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  className="text-muted-foreground hover:text-primary self-start sm:self-auto"
+                  onClick={scrollToScripts}
+                >
+                  View all
+                </Button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {featured.map((product) => (
@@ -86,12 +159,41 @@ export default function Home() {
           </section>
         )}
 
+        {/* Features / Why Choose Us */}
+        <Features />
+
         {/* All Scripts Section */}
         <section id="scripts" className="py-16 sm:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-3 mb-8">
-              <Filter className="h-5 w-5 text-primary" />
-              <h2 className="text-2xl sm:text-3xl font-bold">All Scripts</h2>
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <Filter className="h-5 w-5 text-primary" />
+                  <span className="text-primary text-xs font-semibold uppercase tracking-widest">
+                    Catalog
+                  </span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">All Scripts</h2>
+                <p className="text-muted-foreground text-sm mt-2">
+                  Browse our full library of premium FiveM resources.
+                </p>
+              </div>
+              {/* Sort dropdown */}
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <ArrowDownUp className="h-4 w-4 text-muted-foreground" />
+                <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
+                  <SelectTrigger className="w-[180px] h-10 bg-card border-border rounded-xl">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card border-border">
+                    {(Object.keys(SORT_LABELS) as SortOption[]).map((opt) => (
+                      <SelectItem key={opt} value={opt}>
+                        {SORT_LABELS[opt]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* Search & Filter */}
@@ -131,27 +233,69 @@ export default function Home() {
               </div>
             ) : filteredProducts.length === 0 ? (
               <div className="text-center py-20">
-                <p className="text-muted-foreground">No scripts found matching your criteria.</p>
+                <p className="text-muted-foreground">
+                  No scripts found matching your criteria.
+                </p>
+                <Button
+                  variant="outline"
+                  className="mt-4 rounded-xl border-border"
+                  onClick={() => {
+                    setSearch('')
+                    setCategory('All')
+                  }}
+                >
+                  Reset filters
+                </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onViewDetail={openDetail}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="text-xs text-muted-foreground mb-4">
+                  Showing {filteredProducts.length} of {products.length} scripts
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {filteredProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onViewDetail={openDetail}
+                    />
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </section>
+
+        {/* CTA Banner */}
+        <CTABanner onBrowse={scrollToScripts} />
+
+        {/* Testimonials */}
+        <Testimonials />
+
+        {/* Recently Viewed */}
+        <RecentlyViewed onViewDetail={openDetail} />
+
+        {/* FAQ */}
+        <FAQ />
+
+        {/* Newsletter */}
+        <Newsletter />
       </main>
 
       <Footer />
 
       {/* Overlays */}
-      <CartSheet open={cartOpen} onOpenChange={setCartOpen} />
+      <CartSheet
+        open={cartOpen}
+        onOpenChange={setCartOpen}
+        onCheckout={() => setCheckoutOpen(true)}
+      />
+      <WishlistSheet
+        open={wishlistOpen}
+        onOpenChange={setWishlistOpen}
+        onViewDetail={openDetail}
+      />
+      <CheckoutDialog open={checkoutOpen} onOpenChange={setCheckoutOpen} />
       <ProductDetailDialog
         product={selectedProduct}
         open={detailOpen}

@@ -1,18 +1,20 @@
 'use client'
 
-import { ShoppingCart, Menu, X } from 'lucide-react'
+import { ShoppingCart, Menu, X, Heart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useCartStore } from '@/lib/store'
+import { useCartStore, useWishlistStore } from '@/lib/store'
 import { useState, useEffect } from 'react'
 
 interface NavbarProps {
   onCartOpen: () => void
+  onWishlistOpen: () => void
 }
 
-export function Navbar({ onCartOpen }: NavbarProps) {
+export function Navbar({ onCartOpen, onWishlistOpen }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const totalItems = useCartStore((s) => s.totalItems())
+  const wishlistCount = useWishlistStore((s) => s.ids.length)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -25,6 +27,18 @@ export function Navbar({ onCartOpen }: NavbarProps) {
     const el = document.getElementById(id)
     if (el) el.scrollIntoView({ behavior: 'smooth' })
   }
+
+  const cartBadge = totalItems > 0 && (
+    <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-bold">
+      {totalItems}
+    </span>
+  )
+
+  const wishlistBadge = wishlistCount > 0 && (
+    <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-bold">
+      {wishlistCount}
+    </span>
+  )
 
   return (
     <nav
@@ -61,46 +75,69 @@ export function Navbar({ onCartOpen }: NavbarProps) {
               Featured
             </button>
             <button
+              onClick={() => scrollTo('faq')}
+              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              FAQ
+            </button>
+            <button
               onClick={() => scrollTo('about')}
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               About
             </button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative text-muted-foreground hover:text-primary"
-              onClick={onCartOpen}
-            >
-              <ShoppingCart className="h-5 w-5" />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-bold">
-                  {totalItems}
-                </span>
-              )}
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-muted-foreground hover:text-primary"
+                onClick={onWishlistOpen}
+                aria-label="Wishlist"
+              >
+                <Heart className="h-5 w-5" />
+                {wishlistBadge}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-muted-foreground hover:text-primary"
+                onClick={onCartOpen}
+                aria-label="Cart"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {cartBadge}
+              </Button>
+            </div>
           </div>
 
           {/* Mobile Menu Button + Cart */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative text-muted-foreground hover:text-primary"
+              onClick={onWishlistOpen}
+              aria-label="Wishlist"
+            >
+              <Heart className="h-5 w-5" />
+              {wishlistBadge}
+            </Button>
             <Button
               variant="ghost"
               size="icon"
               className="relative text-muted-foreground hover:text-primary"
               onClick={onCartOpen}
+              aria-label="Cart"
             >
               <ShoppingCart className="h-5 w-5" />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-bold">
-                  {totalItems}
-                </span>
-              )}
+              {cartBadge}
             </Button>
             <Button
               variant="ghost"
               size="icon"
               className="text-muted-foreground"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Menu"
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
@@ -121,6 +158,12 @@ export function Navbar({ onCartOpen }: NavbarProps) {
               className="block w-full text-left px-2 py-2 text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               Featured
+            </button>
+            <button
+              onClick={() => scrollTo('faq')}
+              className="block w-full text-left px-2 py-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              FAQ
             </button>
             <button
               onClick={() => scrollTo('about')}

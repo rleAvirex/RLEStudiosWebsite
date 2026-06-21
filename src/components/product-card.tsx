@@ -1,10 +1,10 @@
 'use client'
 
-import { ShoppingCart, Star, Code, Check } from 'lucide-react'
+import { ShoppingCart, Star, Code, Check, Heart, TrendingUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { type Product, useCartStore } from '@/lib/store'
+import { type Product, useCartStore, useWishlistStore } from '@/lib/store'
 import { toast } from '@/hooks/use-toast'
 
 interface ProductCardProps {
@@ -15,6 +15,8 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onViewDetail, featured }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem)
+  const toggleWishlist = useWishlistStore((s) => s.toggleItem)
+  const isInWishlist = useWishlistStore((s) => s.ids.includes(product.id))
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -25,10 +27,49 @@ export function ProductCard({ product, onViewDetail, featured }: ProductCardProp
     })
   }
 
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    toggleWishlist(product)
+    toast({
+      title: isInWishlist ? 'Removed from wishlist' : 'Added to wishlist',
+      description: product.name,
+    })
+  }
+
+  const hasDiscount =
+    product.originalPrice && product.originalPrice > product.price
+  const discountPercent = hasDiscount
+    ? Math.round(
+        ((product.originalPrice! - product.price) / product.originalPrice!) * 100
+      )
+    : 0
+
+  const renderStars = (rating: number) => {
+    return (
+      <div className="flex items-center gap-0.5">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star
+            key={i}
+            className={`h-3 w-3 ${
+              i < Math.floor(rating)
+                ? 'fill-primary text-primary'
+                : i < rating
+                ? 'fill-primary/50 text-primary/50'
+                : 'text-muted-foreground/40'
+            }`}
+          />
+        ))}
+        <span className="text-xs text-muted-foreground ml-1">
+          {rating.toFixed(1)}
+        </span>
+      </div>
+    )
+  }
+
   return (
     <Card
       className={`group cursor-pointer bg-card border-border hover:border-primary/30 transition-all duration-300 overflow-hidden ${
-        featured ? 'hover:shadow-lg hover:shadow-primary/5' : ''
+        featured ? 'hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1' : 'hover:shadow-md hover:shadow-primary/5'
       }`}
       onClick={() => onViewDetail(product)}
     >
@@ -39,16 +80,49 @@ export function ProductCard({ product, onViewDetail, featured }: ProductCardProp
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
-        {product.isFeatured && (
-          <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs">
-            <Star className="h-3 w-3 mr-1" />
-            Featured
-          </Badge>
-        )}
-        <Badge variant="secondary" className="absolute top-3 right-3 text-xs bg-card/80 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-gradient-to-t from-card/90 via-card/20 to-transparent" />
+
+        {/* Top-left: Featured badge OR discount badge */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+          {product.isFeatured && (
+            <Badge className="bg-primary text-primary-foreground text-xs w-fit">
+              <Star className="h-3 w-3 mr-1" />
+              Featured
+            </Badge>
+          )}
+          {hasDiscount && (
+            <Badge className="bg-red-500/90 text-white text-xs w-fit">
+              -{discountPercent}%
+            </Badge>
+          )}
+        </div>
+
+        {/* Top-right: Category badge */}
+        <Badge
+          variant="secondary"
+          className="absolute top-3 right-3 text-xs bg-card/80 backdrop-blur-sm"
+        >
           {product.category}
         </Badge>
+
+        {/* Wishlist heart */}
+        <button
+          onClick={handleToggleWishlist}
+          className={`absolute bottom-3 right-3 w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all ${
+            isInWishlist
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-card/80 text-muted-foreground hover:text-primary'
+          }`}
+          aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+        >
+          <Heart className={`h-4 w-4 ${isInWishlist ? 'fill-current' : ''}`} />
+        </button>
+
+        {/* Sales count */}
+        <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 rounded-md bg-card/80 backdrop-blur-sm text-xs text-muted-foreground">
+          <TrendingUp className="h-3 w-3 text-primary" />
+          {product.salesCount.toLocaleString()} sold
+        </div>
       </div>
 
       <CardContent className="p-4 space-y-3">
@@ -57,10 +131,20 @@ export function ProductCard({ product, onViewDetail, featured }: ProductCardProp
           <h3 className="font-semibold text-sm sm:text-base leading-tight group-hover:text-primary transition-colors">
             {product.name}
           </h3>
-          <span className="text-primary font-bold text-lg whitespace-nowrap">
-            €{product.price.toFixed(2)}
-          </span>
+          <div className="text-right shrink-0">
+            <div className="text-primary font-bold text-base sm:text-lg whitespace-nowrap">
+              €{product.price.toFixed(2)}
+            </div>
+            {hasDiscount && (
+              <div className="text-xs text-muted-foreground line-through">
+                €{product.originalPrice!.toFixed(2)}
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Rating */}
+        {renderStars(product.rating)}
 
         {/* Description */}
         <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2 leading-relaxed">

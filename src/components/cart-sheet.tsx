@@ -1,13 +1,12 @@
 'use client'
 
-import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react'
+import { Minus, Plus, Trash2, ShoppingBag, ShieldCheck, Download, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetFooter,
 } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
 import { useCartStore } from '@/lib/store'
@@ -15,10 +14,17 @@ import { useCartStore } from '@/lib/store'
 interface CartSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  onCheckout: () => void
 }
 
-export function CartSheet({ open, onOpenChange }: CartSheetProps) {
-  const { items, removeItem, updateQuantity, totalPrice, clearCart } = useCartStore()
+export function CartSheet({ open, onOpenChange, onCheckout }: CartSheetProps) {
+  const { items, removeItem, updateQuantity, totalPrice, totalSavings, clearCart } = useCartStore()
+
+  const handleCheckout = () => {
+    if (items.length === 0) return
+    onOpenChange(false)
+    onCheckout()
+  }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -46,10 +52,17 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
                 Browse our scripts and add some to your cart
               </p>
             </div>
+            <Button
+              variant="outline"
+              className="rounded-xl border-border hover:border-primary/40"
+              onClick={() => onOpenChange(false)}
+            >
+              Browse Scripts
+            </Button>
           </div>
         ) : (
           <>
-            <div className="flex-1 overflow-y-auto py-4 space-y-4">
+            <div className="flex-1 overflow-y-auto py-4 space-y-3">
               {items.map((item) => (
                 <div
                   key={item.product.id}
@@ -64,9 +77,17 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-medium truncate">{item.product.name}</h4>
-                    <p className="text-primary font-semibold text-sm mt-0.5">
-                      €{item.product.price.toFixed(2)}
-                    </p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-primary font-semibold text-sm">
+                        €{item.product.price.toFixed(2)}
+                      </span>
+                      {item.product.originalPrice &&
+                        item.product.originalPrice > item.product.price && (
+                          <span className="text-xs text-muted-foreground line-through">
+                            €{item.product.originalPrice.toFixed(2)}
+                          </span>
+                        )}
+                    </div>
                     <div className="flex items-center gap-2 mt-2">
                       <Button
                         variant="outline"
@@ -105,13 +126,33 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
               ))}
             </div>
 
-            <div className="space-y-4 pt-4">
+            <div className="space-y-3 pt-4">
+              {/* Trust badges */}
+              <div className="flex items-center justify-center gap-4 text-[11px] text-muted-foreground py-1">
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="h-3 w-3 text-primary" />
+                  Secure payment
+                </span>
+                <span className="flex items-center gap-1">
+                  <Download className="h-3 w-3 text-primary" />
+                  Instant delivery
+                </span>
+                <span className="flex items-center gap-1">
+                  <RefreshCw className="h-3 w-3 text-primary" />
+                  Lifetime updates
+                </span>
+              </div>
+
               <Separator className="bg-border" />
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>€{totalPrice().toFixed(2)}</span>
-                </div>
+              <div className="space-y-1.5">
+                {totalSavings() > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-green-500">You save</span>
+                    <span className="text-green-500 font-medium">
+                      −€{totalSavings().toFixed(2)}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between font-semibold text-lg">
                   <span>Total</span>
                   <span className="text-primary">€{totalPrice().toFixed(2)}</span>
@@ -121,8 +162,9 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
               <Button
                 size="lg"
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
+                onClick={handleCheckout}
               >
-                Checkout
+                Checkout — €{totalPrice().toFixed(2)}
               </Button>
               <Button
                 variant="ghost"
